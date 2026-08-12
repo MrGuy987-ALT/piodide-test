@@ -1,2106 +1,2018 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/x-icon" href="images/python.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>PyLite</title>
+    <link rel="icon" type="image/x-icon" href="images/python.png">
 
-<script src="https://cdn.jsdelivr.net/pyodide/v0.28.2/full/pyodide.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.43.2/ace.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.43.2/ext-language_tools.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<style>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Quicksand:wght@300..700&display=swap"
+        rel="stylesheet"
+    >
 
-* {
-    box-sizing: border-box;
-}
+    <title>PyLite</title>
 
-html,
-body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    overflow: hidden;
-}
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.28.2/full/pyodide.js"></script>
 
-body {
-    background: #1a1b26;
-    color: #c0caf5;
-    font-family: "Nunito", "Quicksand";
-}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.43.2/ace.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.43.2/ext-language_tools.min.js"></script>
 
-/* =========================================================
-   TOP BAR
-========================================================= */
+    <style>
 
-.topbar {
-    height: 56px;
+        * {
+            box-sizing: border-box;
+        }
 
-    display: flex;
-    align-items: center;
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
 
-    gap: 8px;
+        body {
+            background: #1a1b26;
+            color: #c0caf5;
+            font-family: "Nunito", "Quicksand", sans-serif;
+        }
 
-    padding: 0 14px;
+        /* =========================================================
+           TOP BAR
+        ========================================================= */
 
-    background: #16161e;
+        .topbar {
+            height: 56px;
 
-    border-bottom: 1px solid #292e42;
-}
+            display: flex;
+            align-items: center;
 
-.logo {
-    margin-right: auto;
+            gap: 8px;
 
-    color: #7aa2f7;
+            padding: 0 14px;
 
-    font-size: 19px;
-    font-weight: bold;
-}
+            background: #16161e;
 
-.status {
-    color: #565f89;
+            border-bottom: 1px solid #292e42;
+        }
 
-    font-size: 12px;
+        .logo {
+            margin-right: auto;
 
-    margin-right: 8px;
-}
+            color: #7aa2f7;
 
-button {
-    border: 0;
-    border-radius: 6px;
+            font-size: 19px;
+            font-weight: bold;
+        }
 
-    padding: 8px 14px;
+        .status {
+            color: #565f89;
 
-    background: #7aa2f7;
+            font-size: 12px;
 
-    color: #16161e;
+            margin-right: 8px;
+        }
 
-    font-weight: bold;
+        button {
+            border: 0;
+            border-radius: 6px;
 
-    cursor: pointer;
-}
+            padding: 8px 14px;
 
-button:hover {
-    background: #89b4fa;
-}
+            background: #7aa2f7;
 
-button:disabled {
-    opacity: .45;
-    cursor: default;
-}
+            color: #16161e;
 
-.stop {
-    background: #f7768e;
-}
+            font-weight: bold;
 
-.stop:hover {
-    background: #ff899d;
-}
+            cursor: pointer;
+        }
 
-.clear {
-    background: #292e42;
-    color: #c0caf5;
-}
+        button:hover {
+            background: #89b4fa;
+        }
 
-.clear:hover {
-    background: #414868;
-}
+        button:disabled {
+            opacity: .45;
+            cursor: default;
+        }
 
+        .stop {
+            background: #f7768e;
+        }
 
-/* =========================================================
-   WORKSPACE
-========================================================= */
+        .stop:hover {
+            background: #ff899d;
+        }
 
-.workspace {
-    height: calc(100vh - 56px);
+        .clear {
+            background: #292e42;
+            color: #c0caf5;
+        }
 
-    display: grid;
+        .clear:hover {
+            background: #414868;
+        }
 
-    grid-template-columns: 1fr 1fr;
-}
+        /* =========================================================
+           WORKSPACE
+        ========================================================= */
 
-.panel {
-    min-width: 0;
-    min-height: 0;
+        .workspace {
+            height: calc(100vh - 56px);
 
-    display: flex;
-    flex-direction: column;
-}
+            display: grid;
 
-.panel + .panel {
-    border-left: 1px solid #292e42;
-}
+            grid-template-columns: 1fr 1fr;
+        }
 
+        .panel {
+            min-width: 0;
+            min-height: 0;
 
-/* =========================================================
-   PANEL HEADER
-========================================================= */
+            display: flex;
+            flex-direction: column;
+        }
 
-.panel-header {
-    height: 38px;
+        .panel + .panel {
+            border-left: 1px solid #292e42;
+        }
 
-    flex-shrink: 0;
+        /* =========================================================
+           PANEL HEADER
+        ========================================================= */
 
-    display: flex;
-    align-items: center;
+        .panel-header {
+            height: 38px;
 
-    padding: 0 14px;
+            flex-shrink: 0;
 
-    background: #16161e;
+            display: flex;
+            align-items: center;
 
-    border-bottom: 1px solid #292e42;
+            padding: 0 14px;
 
-    color: #565f89;
+            background: #16161e;
 
-    font-size: 11px;
+            border-bottom: 1px solid #292e42;
 
-    font-weight: bold;
+            color: #565f89;
 
-    letter-spacing: .8px;
+            font-size: 11px;
 
-    text-transform: uppercase;
-}
+            font-weight: bold;
 
+            letter-spacing: .8px;
 
-/* =========================================================
-   EDITOR
-========================================================= */
+            text-transform: uppercase;
+        }
 
-#editor {
-    flex: 1;
+        /* =========================================================
+           EDITOR
+        ========================================================= */
 
-    width: 100%;
-    height: 100%;
-}
+        #editor {
+            flex: 1;
 
+            width: 100%;
+            height: 100%;
+        }
 
-/* =========================================================
-   RIGHT SIDE
-========================================================= */
+        /* =========================================================
+           RIGHT SIDE
+        ========================================================= */
 
-.right-panel {
-    min-height: 0;
+        .right-panel {
+            min-height: 0;
 
-    display: flex;
-    flex-direction: column;
-}
+            display: flex;
+            flex-direction: column;
+        }
 
+        /* =========================================================
+           TABS
+        ========================================================= */
 
-/* =========================================================
-   TABS
-========================================================= */
+        .tabs {
+            height: 40px;
 
-.tabs {
-    height: 40px;
+            flex-shrink: 0;
 
-    flex-shrink: 0;
+            display: flex;
 
-    display: flex;
+            background: #16161e;
 
-    background: #16161e;
+            border-bottom: 1px solid #292e42;
+        }
 
-    border-bottom: 1px solid #292e42;
-}
+        .tab {
+            display: flex;
+            align-items: center;
 
-.tab {
-    display: flex;
-    align-items: center;
+            padding: 0 15px;
 
-    padding: 0 15px;
+            color: #565f89;
 
-    color: #565f89;
+            font-size: 12px;
 
-    font-size: 12px;
+            cursor: pointer;
 
-    cursor: pointer;
+            border-right: 1px solid #292e42;
+        }
 
-    border-right: 1px solid #292e42;
-}
+        .tab:hover {
+            color: #c0caf5;
+            background: #1a1b26;
+        }
 
-.tab:hover {
-    color: #c0caf5;
-    background: #1a1b26;
-}
+        .tab.active {
+            color: #7aa2f7;
 
-.tab.active {
-    color: #7aa2f7;
+            background: #1a1b26;
 
-    background: #1a1b26;
+            border-bottom: 2px solid #7aa2f7;
+        }
 
-    border-bottom: 2px solid #7aa2f7;
-}
+        /* =========================================================
+           VIEWS
+        ========================================================= */
 
+        .view {
+            display: none;
 
-/* =========================================================
-   VIEWS
-========================================================= */
+            flex: 1;
 
-.view {
-    display: none;
+            min-height: 0;
+        }
 
-    flex: 1;
+        .view.active {
+            display: flex;
+        }
 
-    min-height: 0;
-}
+        /* =========================================================
+           CONSOLE
+        ========================================================= */
 
-.view.active {
-    display: flex;
-}
+        .console-view {
+            flex-direction: column;
 
+            background: #101014;
+        }
 
-/* =========================================================
-   CONSOLE
-========================================================= */
+        #console {
+            flex: 1;
 
-.console-view {
-    flex-direction: column;
+            min-height: 0;
 
-    background: #101014;
-}
+            padding: 14px 16px;
 
-#console {
-    flex: 1;
+            overflow-y: auto;
 
-    min-height: 0;
+            white-space: pre-wrap;
 
-    padding: 14px 16px;
+            word-break: break-word;
 
-    overflow-y: auto;
+            font-family:
+                "Cascadia Code",
+                "Fira Code",
+                Consolas,
+                monospace;
 
-    white-space: pre-wrap;
+            font-size: 14px;
 
-    word-break: break-word;
+            line-height: 1.55;
+        }
 
-    font-family:
-        "Cascadia Code",
-        "Fira Code",
-        Consolas,
-        monospace;
+        .console-line {
+            white-space: pre-wrap;
+        }
 
-    font-size: 14px;
+        .normal {
+            color: #c0caf5;
+        }
 
-    line-height: 1.55;
-}
+        .system {
+            color: #565f89;
+        }
 
-.console-line {
-    white-space: pre-wrap;
-}
+        .error {
+            color: #f7768e;
+        }
 
-.normal {
-    color: #c0caf5;
-}
+        .input-output {
+            color: #9ece6a;
+        }
 
-.system {
-    color: #565f89;
-}
+        /* =========================================================
+           CONSOLE INPUT
+        ========================================================= */
 
-.error {
-    color: #f7768e;
-}
+        .input-area {
+            display: none;
 
-.input-output {
-    color: #9ece6a;
-}
+            padding: 9px 13px;
 
+            background: #16161e;
 
-/* =========================================================
-   CONSOLE INPUT
-========================================================= */
+            border-top: 1px solid #292e42;
+        }
 
-.input-area {
-    display: none;
+        .input-row {
+            display: flex;
 
-    padding: 9px 13px;
+            align-items: center;
 
-    background: #16161e;
+            gap: 8px;
+        }
 
-    border-top: 1px solid #292e42;
-}
+        .input-prompt {
+            color: #7aa2f7;
 
-.input-row {
-    display: flex;
+            font-family:
+                "Cascadia Code",
+                Consolas,
+                monospace;
+        }
 
-    align-items: center;
+        #consoleInput {
+            flex: 1;
 
-    gap: 8px;
-}
+            min-width: 0;
 
-.input-prompt {
-    color: #7aa2f7;
+            padding: 7px 9px;
 
-    font-family:
-        "Cascadia Code",
-        Consolas,
-        monospace;
-}
+            border: 1px solid #414868;
 
-#consoleInput {
-    flex: 1;
+            border-radius: 5px;
 
-    min-width: 0;
+            outline: none;
 
-    padding: 7px 9px;
+            background: #101014;
 
-    border: 1px solid #414868;
+            color: #9ece6a;
 
-    border-radius: 5px;
+            font-family:
+                "Cascadia Code",
+                Consolas,
+                monospace;
 
-    outline: none;
+            font-size: 14px;
+        }
 
-    background: #101014;
+        #consoleInput:focus {
+            border-color: #7aa2f7;
+        }
 
-    color: #9ece6a;
+        /* =========================================================
+           TURTLE
+        ========================================================= */
 
-    font-family:
-        "Cascadia Code",
-        Consolas,
-        monospace;
+        .turtle-view {
+            position: relative;
 
-    font-size: 14px;
-}
+            align-items: center;
+            justify-content: center;
 
-#consoleInput:focus {
-    border-color: #7aa2f7;
-}
+            background: #101014;
+        }
 
+        .turtle-stage {
+            position: relative;
 
-/* =========================================================
-   TURTLE
-========================================================= */
+            width: 700px;
+            height: 500px;
 
-.turtle-view {
-    position: relative;
+            max-width: 95%;
+            max-height: 95%;
 
-    align-items: center;
-    justify-content: center;
+            box-shadow:
+                0 10px 35px rgba(0, 0, 0, .45);
+        }
 
-    background: #101014;
-}
+        .turtle-stage canvas {
+            position: absolute;
 
-.turtle-stage {
-    position: relative;
+            left: 0;
+            top: 0;
 
-    width: 700px;
-    height: 500px;
+            width: 100%;
+            height: 100%;
+        }
 
-    max-width: 95%;
-    max-height: 95%;
+        #turtleDrawingCanvas {
+            background: white;
+        }
 
-    box-shadow:
-        0 10px 35px rgba(0,0,0,.45);
-}
+        #turtleCanvas {
+            pointer-events: none;
+        }
 
-.turtle-stage canvas {
-    position: absolute;
+        /* =========================================================
+           CANVAS
+        ========================================================= */
 
-    left: 0;
-    top: 0;
+        .canvas-view {
+            position: relative;
 
-    width: 100%;
-    height: 100%;
-}
+            align-items: center;
+            justify-content: center;
 
-#turtleDrawingCanvas {
-    background: white;
-}
+            background: #101014;
+        }
 
-#turtleCanvas {
-    pointer-events: none;
-}
+        #pythonCanvas {
+            max-width: 95%;
+            max-height: 95%;
 
+            background: white;
 
-/* =========================================================
-   CANVAS
-========================================================= */
+            box-shadow:
+                0 10px 35px rgba(0, 0, 0, .45);
+        }
 
-.canvas-view {
-    position: relative;
+        /* =========================================================
+           WEB
+        ========================================================= */
 
-    align-items: center;
-    justify-content: center;
+        .web-view {
+            background: white;
+        }
 
-    background: #101014;
-}
+        #webFrame {
+            width: 100%;
+            height: 100%;
 
-#pythonCanvas {
-    max-width: 95%;
-    max-height: 95%;
+            border: 0;
+        }
 
-    background: white;
+        /* =========================================================
+           MOBILE
+        ========================================================= */
 
-    box-shadow:
-        0 10px 35px rgba(0,0,0,.45);
-}
+        @media (max-width: 800px) {
 
+            body {
+                overflow: auto;
+            }
 
-/* =========================================================
-   WEB
-========================================================= */
+            .workspace {
+                height: calc(100vh - 56px);
 
-.web-view {
-    background: white;
-}
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 1fr;
+            }
 
-#webFrame {
-    width: 100%;
-    height: 100%;
+            .panel + .panel {
+                border-left: 0;
+                border-top: 1px solid #292e42;
+            }
 
-    border: 0;
-}
+            .status {
+                display: none;
+            }
 
+        }
 
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media (max-width: 800px) {
-
-    body {
-        overflow: auto;
-    }
-
-    .workspace {
-        height: calc(100vh - 56px);
-
-        grid-template-columns: 1fr;
-        grid-template-rows: 1fr 1fr;
-    }
-
-    .panel + .panel {
-        border-left: 0;
-        border-top: 1px solid #292e42;
-    }
-
-    .status {
-        display: none;
-    }
-
-}
-
-</style>
+    </style>
 </head>
-
 
 <body>
 
+    <!-- =========================================================
+         HEADER
+    ========================================================= -->
 
-<!-- =========================================================
-     HEADER
-========================================================= -->
+    <header class="topbar">
 
-<header class="topbar">
-
-    <div class="logo">
-        PyLite
-    </div>
-
-    <div
-        class="status"
-        id="status"
-    >
-        Loading Python...
-    </div>
-
-    <button id="runButton" disabled>
-        Run
-    </button>
-
-    <button
-        id="stopButton"
-        class="stop"
-        disabled
-    >
-        Stop
-    </button>
-
-    <button
-        id="clearButton"
-        class="clear"
-    >
-        Clear
-    </button>
-
-</header>
-
-
-<!-- =========================================================
-     MAIN
-========================================================= -->
-
-<main class="workspace">
-
-
-    <!-- =====================================================
-         EDITOR
-    ====================================================== -->
-
-    <section class="panel">
-
-        <div class="panel-header">
-            Python
+        <div class="logo">
+            PyLite
         </div>
-
-        <div id="editor"></div>
-
-    </section>
-
-
-    <!-- =====================================================
-         OUTPUT
-    ====================================================== -->
-
-    <section class="panel right-panel">
-
-
-        <!-- =================================================
-             TABS
-        ================================================== -->
-
-        <div class="tabs">
-
-            <div
-                class="tab active"
-                data-view="consoleView"
-            >
-                Console
-            </div>
-
-            <div
-                class="tab"
-                data-view="turtleView"
-            >
-                Turtle
-            </div>
-
-            <div
-                class="tab"
-                data-view="canvasView"
-            >
-                Canvas
-            </div>
-
-            <div
-                class="tab"
-                data-view="webView"
-            >
-                Web
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
-             CONSOLE
-        ================================================== -->
 
         <div
-            class="view console-view active"
-            id="consoleView"
+            class="status"
+            id="status"
         >
+            Loading Python...
+        </div>
 
-            <div id="console"></div>
+        <button
+            id="runButton"
+            disabled
+        >
+            Run
+        </button>
+
+        <button
+            id="stopButton"
+            class="stop"
+            disabled
+        >
+            Stop
+        </button>
+
+        <button
+            id="clearButton"
+            class="clear"
+        >
+            Clear
+        </button>
+
+    </header>
+
+
+    <!-- =========================================================
+         MAIN
+    ========================================================= -->
+
+    <main class="workspace">
+
+        <!-- =====================================================
+             EDITOR
+        ====================================================== -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+                Python
+            </div>
+
+            <div id="editor"></div>
+
+        </section>
+
+
+        <!-- =====================================================
+             OUTPUT
+        ====================================================== -->
+
+        <section class="panel right-panel">
+
+            <!-- =================================================
+                 TABS
+            ================================================== -->
+
+            <div class="tabs">
+
+                <div
+                    class="tab active"
+                    data-view="consoleView"
+                >
+                    Console
+                </div>
+
+                <div
+                    class="tab"
+                    data-view="turtleView"
+                >
+                    Turtle
+                </div>
+
+                <div
+                    class="tab"
+                    data-view="canvasView"
+                >
+                    Canvas
+                </div>
+
+                <div
+                    class="tab"
+                    data-view="webView"
+                >
+                    Web
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 CONSOLE
+            ================================================== -->
 
             <div
-                class="input-area"
-                id="inputArea"
+                class="view console-view active"
+                id="consoleView"
             >
 
-                <div class="input-row">
+                <div id="console"></div>
 
-                    <span
-                        class="input-prompt"
-                        id="inputPrompt"
-                    >
-                        &gt;&gt;&gt;
-                    </span>
+                <div
+                    class="input-area"
+                    id="inputArea"
+                >
 
-                    <input
-                        id="consoleInput"
-                        autocomplete="off"
-                        spellcheck="false"
-                    >
+                    <div class="input-row">
+
+                        <span
+                            class="input-prompt"
+                            id="inputPrompt"
+                        >
+                            &gt;&gt;&gt;
+                        </span>
+
+                        <input
+                            id="consoleInput"
+                            autocomplete="off"
+                            spellcheck="false"
+                        >
+
+                    </div>
 
                 </div>
 
             </div>
 
-        </div>
+
+            <!-- =================================================
+                 TURTLE
+            ================================================== -->
+
+            <div
+                class="view turtle-view"
+                id="turtleView"
+            >
+
+                <div class="turtle-stage">
+
+                    <canvas
+                        id="turtleDrawingCanvas"
+                        width="700"
+                        height="500"
+                    ></canvas>
+
+                    <canvas
+                        id="turtleCanvas"
+                        width="700"
+                        height="500"
+                    ></canvas>
+
+                </div>
+
+            </div>
 
 
-        <!-- =================================================
-             TURTLE
-        ================================================== -->
+            <!-- =================================================
+                 CANVAS
+            ================================================== -->
 
-        <div
-            class="view turtle-view"
-            id="turtleView"
-        >
-
-            <div class="turtle-stage">
+            <div
+                class="view canvas-view"
+                id="canvasView"
+            >
 
                 <canvas
-                    id="turtleDrawingCanvas"
-                    width="700"
-                    height="500"
-                ></canvas>
-
-                <canvas
-                    id="turtleCanvas"
+                    id="pythonCanvas"
                     width="700"
                     height="500"
                 ></canvas>
 
             </div>
 
-        </div>
+
+            <!-- =================================================
+                 WEB
+            ================================================== -->
+
+            <div
+                class="view web-view"
+                id="webView"
+            >
+
+                <iframe
+                    id="webFrame"
+                    sandbox="allow-scripts"
+                ></iframe>
+
+            </div>
+
+        </section>
+
+    </main>
 
 
-        <!-- =================================================
-             CANVAS
-        ================================================== -->
+    <script>
 
-        <div
-            class="view canvas-view"
-            id="canvasView"
-        >
+        /* =========================================================
+           GLOBALS
+        ========================================================= */
 
-            <canvas
-                id="pythonCanvas"
-                width="700"
-                height="500"
-            ></canvas>
+        let pyodide = null;
+        let editor = null;
 
-        </div>
+        let running = false;
+        let executionID = 0;
+
+        let inputResolver = null;
 
 
-        <!-- =================================================
-             WEB
-        ================================================== -->
+        /* =========================================================
+           DOM
+        ========================================================= */
 
-        <div
-            class="view web-view"
-            id="webView"
-        >
+        const consoleElement =
+            document.getElementById("console");
 
-            <iframe
-                id="webFrame"
-                sandbox="allow-scripts"
-            ></iframe>
+        const consoleInput =
+            document.getElementById("consoleInput");
 
-        </div>
+        const inputArea =
+            document.getElementById("inputArea");
 
+        const inputPrompt =
+            document.getElementById("inputPrompt");
 
-    </section>
+        const runButton =
+            document.getElementById("runButton");
 
-</main>
+        const stopButton =
+            document.getElementById("stopButton");
 
+        const clearButton =
+            document.getElementById("clearButton");
 
-<script>
-
-
-/* =========================================================
-   GLOBALS
-========================================================= */
-
-let pyodide = null;
-
-let editor = null;
-
-let running = false;
-
-let executionID = 0;
-
-let inputResolver = null;
+        const status =
+            document.getElementById("status");
 
 
-/* =========================================================
-   DOM
-========================================================= */
+        /* =========================================================
+           TABS
+        ========================================================= */
 
-const consoleElement =
-    document.getElementById("console");
+        document
+            .querySelectorAll(".tab")
+            .forEach(tab => {
 
-const consoleInput =
-    document.getElementById("consoleInput");
+                tab.addEventListener("click", () => {
 
-const inputArea =
-    document.getElementById("inputArea");
+                    document
+                        .querySelectorAll(".tab")
+                        .forEach(t => {
+                            t.classList.remove("active");
+                        });
 
-const inputPrompt =
-    document.getElementById("inputPrompt");
+                    document
+                        .querySelectorAll(".view")
+                        .forEach(v => {
+                            v.classList.remove("active");
+                        });
 
-const runButton =
-    document.getElementById("runButton");
+                    tab.classList.add("active");
 
-const stopButton =
-    document.getElementById("stopButton");
+                    document
+                        .getElementById(tab.dataset.view)
+                        .classList.add("active");
 
-const clearButton =
-    document.getElementById("clearButton");
-
-const status =
-    document.getElementById("status");
-
-
-/* =========================================================
-   TABS
-========================================================= */
-
-document
-    .querySelectorAll(".tab")
-    .forEach(tab => {
-
-        tab.addEventListener("click", () => {
-
-            document
-                .querySelectorAll(".tab")
-                .forEach(t => {
-                    t.classList.remove("active");
                 });
 
-            document
-                .querySelectorAll(".view")
-                .forEach(v => {
-                    v.classList.remove("active");
-                });
-
-            tab.classList.add("active");
-
-            document
-                .getElementById(tab.dataset.view)
-                .classList.add("active");
-
-        });
-
-    });
-
-
-/* =========================================================
-   ACE EDITOR
-========================================================= */
-
-ace.define(
-    "ace/theme/pylite",
-    [
-        "require",
-        "exports",
-        "module"
-    ],
-    function(
-        require,
-        exports
-    ) {
-
-        exports.isDark = true;
-
-        exports.cssClass =
-            "ace-pylite";
-
-        exports.cssText = `
-
-        .ace-pylite {
-            background: #1a1b26;
-            color: #c0caf5;
-        }
-
-        .ace-pylite .ace_gutter {
-            background: #16161e;
-            color: #565f89;
-        }
-
-        .ace-pylite .ace_print-margin {
-            background: #292e42;
-        }
-
-        .ace-pylite .ace_cursor {
-            color: #c0caf5;
-        }
-
-        .ace-pylite
-        .ace_marker-layer
-        .ace_selection {
-            background: #33467c;
-        }
-
-        .ace-pylite
-        .ace_marker-layer
-        .ace_active-line {
-            background: #1f2335;
-        }
-
-        .ace-pylite
-        .ace_gutter-active-line {
-            background: #1f2335;
-            color: #c0caf5;
-        }
-
-        .ace-pylite .ace_keyword {
-            color: #bb9af7;
-        }
-
-        .ace-pylite
-        .ace_keyword.ace_operator {
-            color: #89ddff;
-        }
-
-        .ace-pylite .ace_constant {
-            color: #ff9e64;
-        }
-
-        .ace-pylite
-        .ace_constant.ace_numeric {
-            color: #ff9e64;
-        }
-
-        .ace-pylite .ace_string {
-            color: #9ece6a;
-        }
-
-        .ace-pylite .ace_comment {
-            color: #565f89;
-            font-style: italic;
-        }
-
-        .ace-pylite
-        .ace_support.ace_function {
-            color: #7aa2f7;
-        }
-
-        .ace-pylite
-        .ace_entity.ace_name.ace_function {
-            color: #7aa2f7;
-        }
-
-        .ace-pylite
-        .ace_support.ace_class {
-            color: #e0af68;
-        }
-
-        .ace-pylite
-        .ace_entity.ace_name.ace_class {
-            color: #e0af68;
-        }
-
-        .ace-pylite .ace_variable {
-            color: #c0caf5;
-        }
-
-        .ace-pylite
-        .ace_variable.ace_parameter {
-            color: #f7768e;
-        }
-
-        .ace-pylite .ace_meta {
-            color: #e0af68;
-        }
-
-        .ace-pylite .ace_invalid {
-            color: #f7768e;
-        }
-
-        `;
-
-        require(
-            "ace/lib/dom"
-        ).importCssString(
-            exports.cssText,
-            exports.cssClass
-        );
-
-    }
-);
-
-
-editor = ace.edit("editor");
-
-editor.setTheme(
-    "ace/theme/pylite"
-);
-
-editor.session.setMode(
-    "ace/mode/python"
-);
-
-editor.setOptions({
-
-    fontSize: "15px",
-
-    showPrintMargin: false,
-
-    showFoldWidgets: true,
-
-    displayIndentGuides: true,
-
-    highlightActiveLine: true,
-
-    highlightSelectedWord: true,
-
-    tabSize: 4,
-
-    useSoftTabs: true,
-
-    enableBasicAutocompletion: true,
-
-    enableLiveAutocompletion: true,
-
-    enableSnippets: true,
-
-    behavioursEnabled: true,
-
-    wrap: false
-
-});
-
-
-/* =========================================================
-   AUTOCOMPLETE
-========================================================= */
-
-const pythonWords = [
-
-    "and",
-    "as",
-    "assert",
-    "async",
-    "await",
-    "break",
-    "class",
-    "continue",
-    "def",
-    "del",
-    "elif",
-    "else",
-    "except",
-    "False",
-    "finally",
-    "for",
-    "from",
-    "global",
-    "if",
-    "import",
-    "in",
-    "is",
-    "lambda",
-    "None",
-    "not",
-    "or",
-    "pass",
-    "raise",
-    "return",
-    "True",
-    "try",
-    "while",
-    "with",
-    "yield",
-
-    "abs",
-    "all",
-    "any",
-    "bool",
-    "dict",
-    "enumerate",
-    "filter",
-    "float",
-    "input",
-    "int",
-    "len",
-    "list",
-    "map",
-    "max",
-    "min",
-    "open",
-    "print",
-    "range",
-    "round",
-    "set",
-    "sorted",
-    "str",
-    "sum",
-    "tuple",
-    "type",
-    "zip",
-
-    "math",
-    "random",
-    "datetime",
-    "json",
-    "os",
-    "sys",
-    "time",
-    "turtle"
-
-];
-
-
-const pythonCompleter = {
-
-    getCompletions:
-    function(
-        editor,
-        session,
-        pos,
-        prefix,
-        callback
-    ) {
-
-        const results = [];
-
-        pythonWords.forEach(word => {
-
-            results.push({
-
-                caption: word,
-
-                value: word,
-
-                meta: "python",
-
-                score: 1000
-
             });
 
-        });
 
+        /* =========================================================
+           ACE EDITOR THEME
+        ========================================================= */
 
-        const code =
-            editor.getValue();
-
-
-        const definitions =
-            code.matchAll(
-                /\b(?:def|class)\s+([A-Za-z_]\w*)/g
-            );
-
-
-        for (const match of definitions) {
-
-            results.push({
-
-                caption: match[1],
-
-                value: match[1],
-
-                meta: "defined",
-
-                score: 1200
-
-            });
-
-        }
-
-
-        const variables =
-            code.matchAll(
-                /\b([A-Za-z_]\w*)\s*=/g
-            );
-
-
-        for (const match of variables) {
-
-            results.push({
-
-                caption: match[1],
-
-                value: match[1],
-
-                meta: "variable",
-
-                score: 1100
-
-            });
-
-        }
-
-
-        callback(
-            null,
-            results
-        );
-
-    }
-
-};
-
-
-const langTools =
-    ace.require(
-        "ace/ext/language_tools"
-    );
-
-
-langTools.addCompleter(
-    pythonCompleter
-);
-
-
-/* =========================================================
-   CONSOLE
-========================================================= */
-
-function clearConsole() {
-
-    consoleElement.innerHTML = "";
-
-}
-
-
-function writeConsole(
-    text,
-    type = "normal"
-) {
-
-    const line =
-        document.createElement("div");
-
-    line.className =
-        "console-line " + type;
-
-    line.textContent =
-        text;
-
-    consoleElement.appendChild(
-        line
-    );
-
-    consoleElement.scrollTop =
-        consoleElement.scrollHeight;
-
-}
-
-
-function writeConsoleLine(
-    text = "",
-    type = "normal"
-) {
-
-    writeConsole(
-        text,
-        type
-    );
-
-}
-
-
-/* =========================================================
-   INPUT
-========================================================= */
-
-function requestInput(
-    promptText
-) {
-
-    return new Promise(resolve => {
-
-        inputResolver = resolve;
-
-        inputPrompt.textContent =
-            String(promptText || ">>>");
-
-        inputArea.style.display =
-            "block";
-
-        consoleInput.value = "";
-
-        consoleInput.focus();
-
-    });
-
-}
-
-
-function finishInput() {
-
-    inputArea.style.display =
-        "none";
-
-}
-
-
-consoleInput.addEventListener(
-    "keydown",
-    event => {
-
-        if (event.key !== "Enter") {
-            return;
-        }
-
-        const value =
-            consoleInput.value;
-
-        writeConsole(
-            value,
-            "input-output"
-        );
-
-        finishInput();
-
-        if (inputResolver) {
-
-            const resolve =
-                inputResolver;
-
-            inputResolver = null;
-
-            resolve(value);
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   TURTLE CANVAS
-========================================================= */
-
-const turtleDrawingCanvas =
-    document.getElementById(
-        "turtleDrawingCanvas"
-    );
-
-const turtleDrawingCtx =
-    turtleDrawingCanvas.getContext(
-        "2d"
-    );
-
-const turtleCanvas =
-    document.getElementById(
-        "turtleCanvas"
-    );
-
-const turtleCtx =
-    turtleCanvas.getContext(
-        "2d"
-    );
-
-
-/* =========================================================
-   GENERAL CANVAS
-========================================================= */
-
-const pythonCanvas =
-    document.getElementById(
-        "pythonCanvas"
-    );
-
-const pythonCtx =
-    pythonCanvas.getContext(
-        "2d"
-    );
-
-
-function clearPythonCanvas() {
-
-    pythonCtx.clearRect(
-        0,
-        0,
-        pythonCanvas.width,
-        pythonCanvas.height
-    );
-
-    pythonCtx.fillStyle =
-        "white";
-
-    pythonCtx.fillRect(
-        0,
-        0,
-        pythonCanvas.width,
-        pythonCanvas.height
-    );
-
-}
-
-
-clearPythonCanvas();
-
-
-/* =========================================================
-   TURTLE ENGINE
-========================================================= */
-
-class BrowserTurtle {
-
-    constructor() {
-
-        this.reset();
-
-    }
-
-
-    /* -----------------------------------------------------
-       RESET
-    ----------------------------------------------------- */
-
-    reset() {
-
-        this.x =
-            turtleDrawingCanvas.width / 2;
-
-        this.y =
-            turtleDrawingCanvas.height / 2;
-
-        this.angle = 0;
-
-        this.pen = true;
-
-        this.colorValue =
-            "#000000";
-
-        this.widthValue = 1;
-
-        this.visible = true;
-
-        this.speedValue = 0;
-
-
-        /*
-         * Clear drawing layer.
-         */
-
-        turtleDrawingCtx.clearRect(
-            0,
-            0,
-            turtleDrawingCanvas.width,
-            turtleDrawingCanvas.height
-        );
-
-
-        /*
-         * White background.
-         */
-
-        turtleDrawingCtx.fillStyle =
-            "white";
-
-        turtleDrawingCtx.fillRect(
-            0,
-            0,
-            turtleDrawingCanvas.width,
-            turtleDrawingCanvas.height
-        );
-
-
-        /*
-         * Clear turtle layer.
-         */
-
-        turtleCtx.clearRect(
-            0,
-            0,
-            turtleCanvas.width,
-            turtleCanvas.height
-        );
-
-
-        /*
-         * Draw exactly ONE turtle.
-         */
-
-        this.drawTurtle();
-
-    }
-
-
-    /* -----------------------------------------------------
-       CLEAR TURTLE OVERLAY
-    ----------------------------------------------------- */
-
-    clearTurtleOverlay() {
-
-        turtleCtx.clearRect(
-            0,
-            0,
-            turtleCanvas.width,
-            turtleCanvas.height
-        );
-
-    }
-
-
-    /* -----------------------------------------------------
-       DRAW TURTLE
-    ----------------------------------------------------- */
-
-    drawTurtle() {
-
-        /*
-         * This is the key fix.
-         *
-         * We clear ONLY the top layer.
-         *
-         * The actual drawing remains untouched.
-         */
-
-        this.clearTurtleOverlay();
-
-
-        if (!this.visible) {
-            return;
-        }
-
-
-        turtleCtx.save();
-
-
-        turtleCtx.translate(
-            this.x,
-            this.y
-        );
-
-
-        turtleCtx.rotate(
-            -this.angle *
-            Math.PI /
-            180
-        );
-
-
-        turtleCtx.beginPath();
-
-        turtleCtx.moveTo(
-            16,
-            0
-        );
-
-        turtleCtx.lineTo(
-            -10,
-            -9
-        );
-
-        turtleCtx.lineTo(
-            -7,
-            0
-        );
-
-        turtleCtx.lineTo(
-            -10,
-            9
-        );
-
-        turtleCtx.closePath();
-
-
-        turtleCtx.fillStyle =
-            "#7aa2f7";
-
-        turtleCtx.fill();
-
-
-        turtleCtx.strokeStyle =
-            "#16161e";
-
-        turtleCtx.lineWidth =
-            1.5;
-
-        turtleCtx.stroke();
-
-
-        turtleCtx.restore();
-
-    }
-
-
-    /* -----------------------------------------------------
-       MOVE
-    ----------------------------------------------------- */
-
-    forward(distance) {
-
-        distance =
-            Number(distance);
-
-
-        const radians =
-            this.angle *
-            Math.PI /
-            180;
-
-
-        const nx =
-            this.x +
-            Math.cos(radians) *
-            distance;
-
-
-        const ny =
-            this.y -
-            Math.sin(radians) *
-            distance;
-
-
-        if (this.pen) {
-
-            turtleDrawingCtx.beginPath();
-
-            turtleDrawingCtx.moveTo(
-                this.x,
-                this.y
-            );
-
-            turtleDrawingCtx.lineTo(
-                nx,
-                ny
-            );
-
-            turtleDrawingCtx.strokeStyle =
-                this.colorValue;
-
-            turtleDrawingCtx.lineWidth =
-                this.widthValue;
-
-            turtleDrawingCtx.lineCap =
-                "round";
-
-            turtleDrawingCtx.stroke();
-
-        }
-
-
-        this.x = nx;
-
-        this.y = ny;
-
-
-        this.drawTurtle();
-
-    }
-
-
-    fd(distance) {
-
-        this.forward(distance);
-
-    }
-
-
-    backward(distance) {
-
-        this.forward(
-            -Number(distance)
-        );
-
-    }
-
-
-    bk(distance) {
-
-        this.backward(distance);
-
-    }
-
-
-    back(distance) {
-
-        this.backward(distance);
-
-    }
-
-
-    /* -----------------------------------------------------
-       ROTATION
-    ----------------------------------------------------- */
-
-    left(degrees) {
-
-        this.angle +=
-            Number(degrees);
-
-        this.drawTurtle();
-
-    }
-
-
-    lt(degrees) {
-
-        this.left(degrees);
-
-    }
-
-
-    right(degrees) {
-
-        this.angle -=
-            Number(degrees);
-
-        this.drawTurtle();
-
-    }
-
-
-    rt(degrees) {
-
-        this.right(degrees);
-
-    }
-
-
-    /* -----------------------------------------------------
-       PEN
-    ----------------------------------------------------- */
-
-    penup() {
-
-        this.pen = false;
-
-    }
-
-
-    pu() {
-
-        this.penup();
-
-    }
-
-
-    pendown() {
-
-        this.pen = true;
-
-    }
-
-
-    pd() {
-
-        this.pendown();
-
-    }
-
-
-    /* -----------------------------------------------------
-       POSITION
-    ----------------------------------------------------- */
-
-    goto(x, y) {
-
-        if (
-            y === undefined
-        ) {
-
-            y = x[1];
-
-            x = x[0];
-
-        }
-
-
-        x = Number(x);
-        y = Number(y);
-
-
-        const nx =
-            turtleDrawingCanvas.width / 2 +
-            x;
-
-
-        const ny =
-            turtleDrawingCanvas.height / 2 -
-            y;
-
-
-        if (this.pen) {
-
-            turtleDrawingCtx.beginPath();
-
-            turtleDrawingCtx.moveTo(
-                this.x,
-                this.y
-            );
-
-            turtleDrawingCtx.lineTo(
-                nx,
-                ny
-            );
-
-            turtleDrawingCtx.strokeStyle =
-                this.colorValue;
-
-            turtleDrawingCtx.lineWidth =
-                this.widthValue;
-
-            turtleDrawingCtx.lineCap =
-                "round";
-
-            turtleDrawingCtx.stroke();
-
-        }
-
-
-        this.x = nx;
-
-        this.y = ny;
-
-
-        this.drawTurtle();
-
-    }
-
-
-    setx(x) {
-
-        this.goto(
-            Number(x),
-            this.gety()
-        );
-
-    }
-
-
-    sety(y) {
-
-        this.goto(
-            this.getx(),
-            Number(y)
-        );
-
-    }
-
-
-    getx() {
-
-        return (
-            this.x -
-            turtleDrawingCanvas.width / 2
-        );
-
-    }
-
-
-    gety() {
-
-        return (
-            turtleDrawingCanvas.height / 2 -
-            this.y
-        );
-
-    }
-
-
-    xcor() {
-
-        return this.getx();
-
-    }
-
-
-    ycor() {
-
-        return this.gety();
-
-    }
-
-
-    home() {
-
-        this.goto(
-            0,
-            0
-        );
-
-        this.angle = 0;
-
-        this.drawTurtle();
-
-    }
-
-
-    /* -----------------------------------------------------
-       CIRCLE
-    ----------------------------------------------------- */
-
-    circle(
-        radius,
-        extent = 360
-    ) {
-
-        radius =
-            Number(radius);
-
-        extent =
-            Number(extent);
-
-
-        const steps =
-            Math.max(
-                20,
-                Math.ceil(
-                    Math.abs(extent) *
-                    2
-                )
-            );
-
-
-        const angleStep =
-            extent / steps;
-
-
-        const circumference =
-            2 *
-            Math.PI *
-            Math.abs(radius);
-
-
-        const distance =
-            circumference *
-            Math.abs(angleStep) /
-            360;
-
-
-        for (
-            let i = 0;
-            i < steps;
-            i++
-        ) {
-
-            this.left(
-                angleStep
-            );
-
-            this.forward(
-                distance
-            );
-
-        }
-
-    }
-
-
-    /* -----------------------------------------------------
-       COLOUR
-    ----------------------------------------------------- */
-
-    color(value) {
-
-        this.colorValue =
-            String(value);
-
-    }
-
-
-    pencolor(value) {
-
-        this.colorValue =
-            String(value);
-
-    }
-
-
-    /* -----------------------------------------------------
-       PEN SIZE
-    ----------------------------------------------------- */
-
-    pensize(value) {
-
-        this.widthValue =
-            Number(value);
-
-    }
-
-
-    width(value) {
-
-        this.pensize(value);
-
-    }
-
-
-    /* -----------------------------------------------------
-       CLEAR
-    ----------------------------------------------------- */
-
-    clear() {
-
-        turtleDrawingCtx.clearRect(
-            0,
-            0,
-            turtleDrawingCanvas.width,
-            turtleDrawingCanvas.height
-        );
-
-
-        turtleDrawingCtx.fillStyle =
-            "white";
-
-
-        turtleDrawingCtx.fillRect(
-            0,
-            0,
-            turtleDrawingCanvas.width,
-            turtleDrawingCanvas.height
-        );
-
-
-        this.drawTurtle();
-
-    }
-
-
-    /* -----------------------------------------------------
-       SPEED
-    ----------------------------------------------------- */
-
-    speed(value) {
-
-        this.speedValue =
-            Number(value);
-
-    }
-
-
-    /* -----------------------------------------------------
-       VISIBILITY
-    ----------------------------------------------------- */
-
-    hideturtle() {
-
-        this.visible = false;
-
-        this.clearTurtleOverlay();
-
-    }
-
-
-    ht() {
-
-        this.hideturtle();
-
-    }
-
-
-    showturtle() {
-
-        this.visible = true;
-
-        this.drawTurtle();
-
-    }
-
-
-    st() {
-
-        this.showturtle();
-
-    }
-
-}
-
-
-/* =========================================================
-   CREATE SINGLE TURTLE
-========================================================= */
-
-const browserTurtle =
-    new BrowserTurtle();
-
-window.pyLiteTurtle =
-    browserTurtle;
-
-
-/* =========================================================
-   WEB OUTPUT
-========================================================= */
-
-const webFrame =
-    document.getElementById(
-        "webFrame"
-    );
-
-
-function renderWeb(html) {
-
-    const blob =
-        new Blob(
+        ace.define(
+            "ace/theme/pylite",
             [
-                String(html)
+                "require",
+                "exports",
+                "module"
             ],
-            {
-                type: "text/html"
+            function(
+                require,
+                exports
+            ) {
+
+                exports.isDark = true;
+
+                exports.cssClass =
+                    "ace-pylite";
+
+                exports.cssText = `
+
+                    .ace-pylite {
+                        background: #1a1b26;
+                        color: #c0caf5;
+                    }
+
+                    .ace-pylite .ace_gutter {
+                        background: #16161e;
+                        color: #565f89;
+                    }
+
+                    .ace-pylite .ace_print-margin {
+                        background: #292e42;
+                    }
+
+                    .ace-pylite .ace_cursor {
+                        color: #c0caf5;
+                    }
+
+                    .ace-pylite
+                    .ace_marker-layer
+                    .ace_selection {
+                        background: #33467c;
+                    }
+
+                    .ace-pylite
+                    .ace_marker-layer
+                    .ace_active-line {
+                        background: #1f2335;
+                    }
+
+                    .ace-pylite
+                    .ace_gutter-active-line {
+                        background: #1f2335;
+                        color: #c0caf5;
+                    }
+
+                    .ace-pylite .ace_keyword {
+                        color: #bb9af7;
+                    }
+
+                    .ace-pylite
+                    .ace_keyword.ace_operator {
+                        color: #89ddff;
+                    }
+
+                    .ace-pylite .ace_constant {
+                        color: #ff9e64;
+                    }
+
+                    .ace-pylite
+                    .ace_constant.ace_numeric {
+                        color: #ff9e64;
+                    }
+
+                    .ace-pylite .ace_string {
+                        color: #9ece6a;
+                    }
+
+                    .ace-pylite .ace_comment {
+                        color: #565f89;
+                        font-style: italic;
+                    }
+
+                    .ace-pylite
+                    .ace_support.ace_function {
+                        color: #7aa2f7;
+                    }
+
+                    .ace-pylite
+                    .ace_entity.ace_name.ace_function {
+                        color: #7aa2f7;
+                    }
+
+                    .ace-pylite
+                    .ace_support.ace_class {
+                        color: #e0af68;
+                    }
+
+                    .ace-pylite
+                    .ace_entity.ace_name.ace_class {
+                        color: #e0af68;
+                    }
+
+                    .ace-pylite .ace_variable {
+                        color: #c0caf5;
+                    }
+
+                    .ace-pylite
+                    .ace_variable.ace_parameter {
+                        color: #f7768e;
+                    }
+
+                    .ace-pylite .ace_meta {
+                        color: #e0af68;
+                    }
+
+                    .ace-pylite .ace_invalid {
+                        color: #f7768e;
+                    }
+
+                `;
+
+                require("ace/lib/dom").importCssString(
+                    exports.cssText,
+                    exports.cssClass
+                );
+
             }
         );
 
 
-    const url =
-        URL.createObjectURL(blob);
+        /* =========================================================
+           ACE EDITOR
+        ========================================================= */
 
+        editor = ace.edit("editor");
 
-    webFrame.src =
-        url;
+        editor.setTheme(
+            "ace/theme/pylite"
+        );
 
-}
+        editor.session.setMode(
+            "ace/mode/python"
+        );
 
+        editor.setOptions({
 
-/* =========================================================
-   PYTHON INITIALISATION
-========================================================= */
+            fontSize: "15px",
 
-async function loadPython() {
+            showPrintMargin: false,
 
-    try {
+            showFoldWidgets: true,
 
-        status.textContent =
-            "Loading Python...";
+            displayIndentGuides: true,
 
+            highlightActiveLine: true,
 
-        pyodide =
-            await loadPyodide();
+            highlightSelectedWord: true,
 
+            tabSize: 4,
 
-        /* -------------------------------------------------
-           OUTPUT
-        ------------------------------------------------- */
+            useSoftTabs: true,
 
-        pyodide.setStdout({
+            enableBasicAutocompletion: true,
 
-            batched(text) {
+            enableLiveAutocompletion: true,
 
-                writeConsole(
-                    text,
-                    "normal"
-                );
+            enableSnippets: true,
 
-            }
+            behavioursEnabled: true,
 
-        });
-
-
-        pyodide.setStderr({
-
-            batched(text) {
-
-                writeConsole(
-                    text,
-                    "error"
-                );
-
-            }
+            wrap: false
 
         });
 
 
-        /* -------------------------------------------------
-           JAVASCRIPT BRIDGES
-        ------------------------------------------------- */
+        /* =========================================================
+           AUTOCOMPLETE
+        ========================================================= */
 
-        window.pyLiteInput =
-            requestInput;
+        const pythonWords = [
 
-        window.pyLiteWeb =
-            renderWeb;
+            "and",
+            "as",
+            "assert",
+            "async",
+            "await",
+            "break",
+            "class",
+            "continue",
+            "def",
+            "del",
+            "elif",
+            "else",
+            "except",
+            "False",
+            "finally",
+            "for",
+            "from",
+            "global",
+            "if",
+            "import",
+            "in",
+            "is",
+            "lambda",
+            "None",
+            "not",
+            "or",
+            "pass",
+            "raise",
+            "return",
+            "True",
+            "try",
+            "while",
+            "with",
+            "yield",
+
+            "abs",
+            "all",
+            "any",
+            "bool",
+            "dict",
+            "enumerate",
+            "filter",
+            "float",
+            "input",
+            "int",
+            "len",
+            "list",
+            "map",
+            "max",
+            "min",
+            "open",
+            "print",
+            "range",
+            "round",
+            "set",
+            "sorted",
+            "str",
+            "sum",
+            "tuple",
+            "type",
+            "zip",
+
+            "math",
+            "random",
+            "datetime",
+            "json",
+            "os",
+            "sys",
+            "time",
+            "turtle"
+
+        ];
+
+
+        const pythonCompleter = {
+
+            getCompletions:
+                function(
+                    editor,
+                    session,
+                    pos,
+                    prefix,
+                    callback
+                ) {
+
+                    const results = [];
+
+                    pythonWords.forEach(word => {
+
+                        results.push({
+
+                            caption: word,
+
+                            value: word,
+
+                            meta: "python",
+
+                            score: 1000
+
+                        });
+
+                    });
+
+
+                    const code =
+                        editor.getValue();
+
+
+                    const definitions =
+                        code.matchAll(
+                            /\b(?:def|class)\s+([A-Za-z_]\w*)/g
+                        );
+
+
+                    for (const match of definitions) {
+
+                        results.push({
+
+                            caption: match[1],
+
+                            value: match[1],
+
+                            meta: "defined",
+
+                            score: 1200
+
+                        });
+
+                    }
+
+
+                    const variables =
+                        code.matchAll(
+                            /\b([A-Za-z_]\w*)\s*=/g
+                        );
+
+
+                    for (const match of variables) {
+
+                        results.push({
+
+                            caption: match[1],
+
+                            value: match[1],
+
+                            meta: "variable",
+
+                            score: 1100
+
+                        });
+
+                    }
+
+
+                    callback(
+                        null,
+                        results
+                    );
+
+                }
+
+        };
+
+
+        const langTools =
+            ace.require(
+                "ace/ext/language_tools"
+            );
+
+
+        langTools.addCompleter(
+            pythonCompleter
+        );
+
+
+        /* =========================================================
+           CONSOLE
+        ========================================================= */
+
+        function clearConsole() {
+
+            consoleElement.innerHTML = "";
+
+        }
+
+
+        function writeConsole(
+            text,
+            type = "normal"
+        ) {
+
+            const line =
+                document.createElement("div");
+
+            line.className =
+                "console-line " + type;
+
+            line.textContent =
+                text;
+
+            consoleElement.appendChild(
+                line
+            );
+
+            consoleElement.scrollTop =
+                consoleElement.scrollHeight;
+
+        }
+
+
+        function writeConsoleLine(
+            text = "",
+            type = "normal"
+        ) {
+
+            writeConsole(
+                text,
+                type
+            );
+
+        }
+
+
+        /* =========================================================
+           INPUT
+        ========================================================= */
+
+        function requestInput(
+            promptText
+        ) {
+
+            return new Promise(resolve => {
+
+                inputResolver = resolve;
+
+                inputPrompt.textContent =
+                    String(promptText || ">>>");
+
+                inputArea.style.display =
+                    "block";
+
+                consoleInput.value = "";
+
+                consoleInput.focus();
+
+            });
+
+        }
+
+
+        function finishInput() {
+
+            inputArea.style.display =
+                "none";
+
+        }
+
+
+        consoleInput.addEventListener(
+            "keydown",
+            event => {
+
+                if (event.key !== "Enter") {
+                    return;
+                }
+
+                const value =
+                    consoleInput.value;
+
+                writeConsole(
+                    value,
+                    "input-output"
+                );
+
+                finishInput();
+
+                if (inputResolver) {
+
+                    const resolve =
+                        inputResolver;
+
+                    inputResolver = null;
+
+                    resolve(value);
+
+                }
+
+            }
+        );
+
+
+        /* =========================================================
+           TURTLE CANVAS
+        ========================================================= */
+
+        const turtleDrawingCanvas =
+            document.getElementById(
+                "turtleDrawingCanvas"
+            );
+
+        const turtleDrawingCtx =
+            turtleDrawingCanvas.getContext(
+                "2d"
+            );
+
+
+        const turtleCanvas =
+            document.getElementById(
+                "turtleCanvas"
+            );
+
+        const turtleCtx =
+            turtleCanvas.getContext(
+                "2d"
+            );
+
+
+        /* =========================================================
+           GENERAL CANVAS
+        ========================================================= */
+
+        const pythonCanvas =
+            document.getElementById(
+                "pythonCanvas"
+            );
+
+        const pythonCtx =
+            pythonCanvas.getContext(
+                "2d"
+            );
+
+
+        function clearPythonCanvas() {
+
+            pythonCtx.clearRect(
+                0,
+                0,
+                pythonCanvas.width,
+                pythonCanvas.height
+            );
+
+            pythonCtx.fillStyle =
+                "white";
+
+            pythonCtx.fillRect(
+                0,
+                0,
+                pythonCanvas.width,
+                pythonCanvas.height
+            );
+
+        }
+
+
+        clearPythonCanvas();
+
+
+        /* =========================================================
+           TURTLE ENGINE
+        ========================================================= */
+
+        class BrowserTurtle {
+
+            constructor() {
+
+                this.reset();
+
+            }
+
+
+            reset() {
+
+                this.x =
+                    turtleDrawingCanvas.width / 2;
+
+                this.y =
+                    turtleDrawingCanvas.height / 2;
+
+                this.angle = 0;
+
+                this.pen = true;
+
+                this.colorValue =
+                    "#000000";
+
+                this.widthValue = 1;
+
+                this.visible = true;
+
+                this.speedValue = 0;
+
+
+                turtleDrawingCtx.clearRect(
+                    0,
+                    0,
+                    turtleDrawingCanvas.width,
+                    turtleDrawingCanvas.height
+                );
+
+
+                turtleDrawingCtx.fillStyle =
+                    "white";
+
+                turtleDrawingCtx.fillRect(
+                    0,
+                    0,
+                    turtleDrawingCanvas.width,
+                    turtleDrawingCanvas.height
+                );
+
+
+                turtleCtx.clearRect(
+                    0,
+                    0,
+                    turtleCanvas.width,
+                    turtleCanvas.height
+                );
+
+
+                this.drawTurtle();
+
+            }
+
+
+            clearTurtleOverlay() {
+
+                turtleCtx.clearRect(
+                    0,
+                    0,
+                    turtleCanvas.width,
+                    turtleCanvas.height
+                );
+
+            }
+
+
+            drawTurtle() {
+
+                this.clearTurtleOverlay();
+
+                if (!this.visible) {
+                    return;
+                }
+
+                turtleCtx.save();
+
+                turtleCtx.translate(
+                    this.x,
+                    this.y
+                );
+
+                turtleCtx.rotate(
+                    -this.angle *
+                    Math.PI /
+                    180
+                );
+
+
+                turtleCtx.beginPath();
+
+                turtleCtx.moveTo(
+                    16,
+                    0
+                );
+
+                turtleCtx.lineTo(
+                    -10,
+                    -9
+                );
+
+                turtleCtx.lineTo(
+                    -7,
+                    0
+                );
+
+                turtleCtx.lineTo(
+                    -10,
+                    9
+                );
+
+                turtleCtx.closePath();
+
+
+                turtleCtx.fillStyle =
+                    "#7aa2f7";
+
+                turtleCtx.fill();
+
+
+                turtleCtx.strokeStyle =
+                    "#16161e";
+
+                turtleCtx.lineWidth =
+                    1.5;
+
+                turtleCtx.stroke();
+
+                turtleCtx.restore();
+
+            }
+
+
+            forward(distance) {
+
+                distance =
+                    Number(distance);
+
+
+                const radians =
+                    this.angle *
+                    Math.PI /
+                    180;
+
+
+                const nx =
+                    this.x +
+                    Math.cos(radians) *
+                    distance;
+
+
+                const ny =
+                    this.y -
+                    Math.sin(radians) *
+                    distance;
+
+
+                if (this.pen) {
+
+                    turtleDrawingCtx.beginPath();
+
+                    turtleDrawingCtx.moveTo(
+                        this.x,
+                        this.y
+                    );
+
+                    turtleDrawingCtx.lineTo(
+                        nx,
+                        ny
+                    );
+
+                    turtleDrawingCtx.strokeStyle =
+                        this.colorValue;
+
+                    turtleDrawingCtx.lineWidth =
+                        this.widthValue;
+
+                    turtleDrawingCtx.lineCap =
+                        "round";
+
+                    turtleDrawingCtx.stroke();
+
+                }
+
+
+                this.x = nx;
+
+                this.y = ny;
+
+
+                this.drawTurtle();
+
+            }
+
+
+            fd(distance) {
+
+                this.forward(distance);
+
+            }
+
+
+            backward(distance) {
+
+                this.forward(
+                    -Number(distance)
+                );
+
+            }
+
+
+            bk(distance) {
+
+                this.backward(distance);
+
+            }
+
+
+            back(distance) {
+
+                this.backward(distance);
+
+            }
+
+
+            left(degrees) {
+
+                this.angle +=
+                    Number(degrees);
+
+                this.drawTurtle();
+
+            }
+
+
+            lt(degrees) {
+
+                this.left(degrees);
+
+            }
+
+
+            right(degrees) {
+
+                this.angle -=
+                    Number(degrees);
+
+                this.drawTurtle();
+
+            }
+
+
+            rt(degrees) {
+
+                this.right(degrees);
+
+            }
+
+
+            penup() {
+
+                this.pen = false;
+
+            }
+
+
+            pu() {
+
+                this.penup();
+
+            }
+
+
+            pendown() {
+
+                this.pen = true;
+
+            }
+
+
+            pd() {
+
+                this.pendown();
+
+            }
+
+
+            goto(x, y) {
+
+                if (y === undefined) {
+
+                    y = x[1];
+
+                    x = x[0];
+
+                }
+
+
+                x = Number(x);
+
+                y = Number(y);
+
+
+                const nx =
+                    turtleDrawingCanvas.width / 2 +
+                    x;
+
+
+                const ny =
+                    turtleDrawingCanvas.height / 2 -
+                    y;
+
+
+                if (this.pen) {
+
+                    turtleDrawingCtx.beginPath();
+
+                    turtleDrawingCtx.moveTo(
+                        this.x,
+                        this.y
+                    );
+
+                    turtleDrawingCtx.lineTo(
+                        nx,
+                        ny
+                    );
+
+                    turtleDrawingCtx.strokeStyle =
+                        this.colorValue;
+
+                    turtleDrawingCtx.lineWidth =
+                        this.widthValue;
+
+                    turtleDrawingCtx.lineCap =
+                        "round";
+
+                    turtleDrawingCtx.stroke();
+
+                }
+
+
+                this.x = nx;
+
+                this.y = ny;
+
+
+                this.drawTurtle();
+
+            }
+
+
+            setx(x) {
+
+                this.goto(
+                    Number(x),
+                    this.gety()
+                );
+
+            }
+
+
+            sety(y) {
+
+                this.goto(
+                    this.getx(),
+                    Number(y)
+                );
+
+            }
+
+
+            getx() {
+
+                return (
+                    this.x -
+                    turtleDrawingCanvas.width / 2
+                );
+
+            }
+
+
+            gety() {
+
+                return (
+                    turtleDrawingCanvas.height / 2 -
+                    this.y
+                );
+
+            }
+
+
+            xcor() {
+
+                return this.getx();
+
+            }
+
+
+            ycor() {
+
+                return this.gety();
+
+            }
+
+
+            home() {
+
+                this.goto(
+                    0,
+                    0
+                );
+
+                this.angle = 0;
+
+                this.drawTurtle();
+
+            }
+
+
+            circle(
+                radius,
+                extent = 360
+            ) {
+
+                radius =
+                    Number(radius);
+
+                extent =
+                    Number(extent);
+
+
+                const steps =
+                    Math.max(
+                        20,
+                        Math.ceil(
+                            Math.abs(extent) *
+                            2
+                        )
+                    );
+
+
+                const angleStep =
+                    extent / steps;
+
+
+                const circumference =
+                    2 *
+                    Math.PI *
+                    Math.abs(radius);
+
+
+                const distance =
+                    circumference *
+                    Math.abs(angleStep) /
+                    360;
+
+
+                for (
+                    let i = 0;
+                    i < steps;
+                    i++
+                ) {
+
+                    this.left(
+                        angleStep
+                    );
+
+                    this.forward(
+                        distance
+                    );
+
+                }
+
+            }
+
+
+            color(value) {
+
+                this.colorValue =
+                    String(value);
+
+            }
+
+
+            pencolor(value) {
+
+                this.colorValue =
+                    String(value);
+
+            }
+
+
+            pensize(value) {
+
+                this.widthValue =
+                    Number(value);
+
+            }
+
+
+            width(value) {
+
+                this.pensize(value);
+
+            }
+
+
+            clear() {
+
+                turtleDrawingCtx.clearRect(
+                    0,
+                    0,
+                    turtleDrawingCanvas.width,
+                    turtleDrawingCanvas.height
+                );
+
+
+                turtleDrawingCtx.fillStyle =
+                    "white";
+
+
+                turtleDrawingCtx.fillRect(
+                    0,
+                    0,
+                    turtleDrawingCanvas.width,
+                    turtleDrawingCanvas.height
+                );
+
+
+                this.drawTurtle();
+
+            }
+
+
+            speed(value) {
+
+                this.speedValue =
+                    Number(value);
+
+            }
+
+
+            hideturtle() {
+
+                this.visible = false;
+
+                this.clearTurtleOverlay();
+
+            }
+
+
+            ht() {
+
+                this.hideturtle();
+
+            }
+
+
+            showturtle() {
+
+                this.visible = true;
+
+                this.drawTurtle();
+
+            }
+
+
+            st() {
+
+                this.showturtle();
+
+            }
+
+        }
+
+
+        /* =========================================================
+           SINGLE BROWSER TURTLE
+        ========================================================= */
+
+        const browserTurtle =
+            new BrowserTurtle();
 
         window.pyLiteTurtle =
             browserTurtle;
 
 
-        /* -------------------------------------------------
-           PYTHON COMPATIBILITY
-        ------------------------------------------------- */
+        /* =========================================================
+           WEB OUTPUT
+        ========================================================= */
 
-        await pyodide.runPythonAsync(`
+        const webFrame =
+            document.getElementById(
+                "webFrame"
+            );
+
+
+        function renderWeb(html) {
+
+            const blob =
+                new Blob(
+                    [
+                        String(html)
+                    ],
+                    {
+                        type: "text/html"
+                    }
+                );
+
+
+            const url =
+                URL.createObjectURL(blob);
+
+
+            webFrame.src =
+                url;
+
+        }
+
+
+        /* =========================================================
+           PYTHON INITIALISATION
+        ========================================================= */
+
+        async function loadPython() {
+
+            try {
+
+                status.textContent =
+                    "Loading Python...";
+
+
+                pyodide =
+                    await loadPyodide();
+
+
+                /* =================================================
+                   OUTPUT
+                ================================================= */
+
+                pyodide.setStdout({
+
+                    batched(text) {
+
+                        writeConsole(
+                            text,
+                            "normal"
+                        );
+
+                    }
+
+                });
+
+
+                pyodide.setStderr({
+
+                    batched(text) {
+
+                        writeConsole(
+                            text,
+                            "error"
+                        );
+
+                    }
+
+                });
+
+
+                /* =================================================
+                   JAVASCRIPT BRIDGES
+                ================================================= */
+
+                window.pyLiteInput =
+                    requestInput;
+
+                window.pyLiteWeb =
+                    renderWeb;
+
+                window.pyLiteTurtle =
+                    browserTurtle;
+
+
+                /* =================================================
+                   PYTHON COMPATIBILITY
+                ================================================= */
+
+                await pyodide.runPythonAsync(`
 
 import sys
 import types
@@ -2420,6 +2332,16 @@ def home():
     _turtle_instance.home()
 
 
+def xcor():
+
+    return _turtle_instance.xcor()
+
+
+def ycor():
+
+    return _turtle_instance.ycor()
+
+
 def circle(
     radius,
     extent=None
@@ -2489,9 +2411,28 @@ def hideturtle():
     _turtle_instance.hideturtle()
 
 
+def ht():
+
+    hideturtle()
+
+
 def showturtle():
 
     _turtle_instance.showturtle()
+
+
+def st():
+
+    showturtle()
+
+
+# =========================================================
+# PYTHON-SIDE RESET
+# =========================================================
+
+def _pylite_reset():
+
+    _turtle_instance.reset()
 
 
 # =========================================================
@@ -2525,6 +2466,9 @@ turtle.setposition = setposition
 
 turtle.home = home
 
+turtle.xcor = xcor
+turtle.ycor = ycor
+
 turtle.circle = circle
 
 turtle.color = color
@@ -2539,202 +2483,291 @@ turtle.reset = reset
 turtle.speed = speed
 
 turtle.hideturtle = hideturtle
+turtle.ht = ht
+
 turtle.showturtle = showturtle
+turtle.st = st
+
+turtle._pylite_reset = _pylite_reset
 
 
 sys.modules["turtle"] = turtle
 
-        `);
+                `);
 
 
-        status.textContent =
-            "Python 3 • Ready";
+                status.textContent =
+                    "Python 3 • Ready";
 
 
-        runButton.disabled =
-            false;
+                runButton.disabled =
+                    false;
 
 
-        writeConsoleLine(
-            "Python 3 loaded.",
-            "system"
-        );
+                writeConsoleLine(
+                    "Python 3 loaded.",
+                    "system"
+                );
 
 
-        writeConsoleLine(
-            "Ctrl + Enter to run.",
-            "system"
-        );
+                writeConsoleLine(
+                    "Ctrl + Enter to run.",
+                    "system"
+                );
 
-    }
+            }
 
-    catch (error) {
+            catch (error) {
 
-        status.textContent =
-            "Python failed to load";
-
-        writeConsoleLine(
-            String(error),
-            "error"
-        );
-
-        console.error(error);
-
-    }
-
-}
+                status.textContent =
+                    "Python failed to load";
 
 
-/* =========================================================
-   PYTHON CODE TRANSFORMATION
-========================================================= */
-
-function transformInput(code) {
-
-    /*
-     * Convert input() to our visible browser console.
-     *
-     * We only transform simple input calls.
-     */
-
-    return code.replace(
-        /\binput\s*\(/g,
-        "_pylite_input("
-    );
-
-}
+                writeConsoleLine(
+                    String(error),
+                    "error"
+                );
 
 
-/* =========================================================
-   RUN
-========================================================= */
+                console.error(error);
 
-async function runPython() {
+            }
 
-    if (
-        !pyodide ||
-        running
-    ) {
-
-        return;
-
-    }
+        }
 
 
-    /* -----------------------------------------------------
-       NEW RUN = CLEAN EVERYTHING
-    ----------------------------------------------------- */
+        /* =========================================================
+           INPUT TRANSFORMATION
+        ========================================================= */
 
-    clearConsole();
+        function transformInput(code) {
 
-    finishInput();
-
-    clearPythonCanvas();
-
-    /*
-     * This is the important Turtle reset.
-     *
-     * It clears BOTH canvas layers and creates
-     * exactly one turtle at the centre.
-     */
-
-    browserTurtle.reset();
-
-
-    running = true;
-
-    executionID++;
-
-    const currentID =
-        executionID;
-
-
-    runButton.disabled =
-        true;
-
-    stopButton.disabled =
-        false;
-
-
-    writeConsoleLine(
-        ">>> Running...",
-        "system"
-    );
-
-
-    const code =
-        editor.getValue();
-
-
-    try {
-
-        const transformed =
-            transformInput(code);
-
-
-        /*
-         * We use a wrapper so input() can
-         * safely await the visible console.
-         */
-
-        const wrappedCode = `
-async def __pylite_main__():
-    exec(compile(${JSON.stringify(transformed)}, "<editor>", "exec"), globals())
-
-await __pylite_main__()
-`;
-
-
-        await pyodide.runPythonAsync(
-            wrappedCode
-        );
-
-
-        if (
-            currentID === executionID
-        ) {
-
-            writeConsoleLine(
-                "",
-                "normal"
+            return code.replace(
+                /\binput\s*\(/g,
+                "_pylite_input("
             );
 
+        }
+
+
+        /* =========================================================
+           RESET PYTHON TURTLE
+        ========================================================= */
+
+        function resetPythonTurtle() {
+
+            try {
+
+                pyodide.runPython(`
+import turtle
+turtle._pylite_reset()
+`);
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Failed to reset Python turtle:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        /* =========================================================
+           RUN
+        ========================================================= */
+
+        async function runPython() {
+
+            if (
+                !pyodide ||
+                running
+            ) {
+
+                return;
+
+            }
+
+
+            /* =====================================================
+               CLEAN PREVIOUS RUN
+            ===================================================== */
+
+            clearConsole();
+
+            finishInput();
+
+            clearPythonCanvas();
+
+
+            /*
+             * Reset the JavaScript turtle.
+             *
+             * This completely clears the drawing and returns
+             * the turtle to the centre.
+             */
+
+            browserTurtle.reset();
+
+
+            /*
+             * Reset the Python-side turtle object as well.
+             *
+             * This is important because the Python module
+             * survives between executions.
+             */
+
+            resetPythonTurtle();
+
+
+            running = true;
+
+            executionID++;
+
+
+            const currentID =
+                executionID;
+
+
+            runButton.disabled =
+                true;
+
+            stopButton.disabled =
+                false;
+
+
             writeConsoleLine(
-                ">>> Finished.",
+                ">>> Running...",
                 "system"
             );
 
-        }
 
+            const code =
+                editor.getValue();
+
+
+            try {
+
+                const transformed =
+                    transformInput(code);
+
+
+                /*
+                 * IMPORTANT:
+                 *
+                 * Every run receives a completely new
+                 * Python namespace.
+                 *
+                 * This means variables, functions and objects
+                 * from the previous program do not leak
+                 * into the next execution.
+                 */
+
+                const wrappedCode = `
+
+async def __pylite_main__():
+
+    pylite_globals = {
+        "__name__": "__main__",
+        "__builtins__": __builtins__
     }
 
-    catch (error) {
+    exec(
+        compile(
+            ${JSON.stringify(transformed)},
+            "<editor>",
+            "exec"
+        ),
+        pylite_globals,
+        pylite_globals
+    )
 
-        if (
-            currentID === executionID
-        ) {
 
-            writeConsoleLine(
-                "",
-                "normal"
-            );
+await __pylite_main__()
 
-            writeConsoleLine(
-                String(error),
-                "error"
-            );
+`;
+
+
+                await pyodide.runPythonAsync(
+                    wrappedCode
+                );
+
+
+                if (
+                    currentID === executionID
+                ) {
+
+                    writeConsoleLine(
+                        "",
+                        "normal"
+                    );
+
+                    writeConsoleLine(
+                        ">>> Finished.",
+                        "system"
+                    );
+
+                }
+
+            }
+
+            catch (error) {
+
+                if (
+                    currentID === executionID
+                ) {
+
+                    writeConsoleLine(
+                        "",
+                        "normal"
+                    );
+
+                    writeConsoleLine(
+                        String(error),
+                        "error"
+                    );
+
+                }
+
+            }
+
+            finally {
+
+                if (
+                    currentID === executionID
+                ) {
+
+                    running = false;
+
+                    runButton.disabled =
+                        false;
+
+                    stopButton.disabled =
+                        true;
+
+                }
+
+            }
 
         }
 
-    }
 
-    finally {
+        /* =========================================================
+           STOP
+        ========================================================= */
 
-        if (
-            currentID === executionID
-        ) {
+        function stopPython() {
+
+            executionID++;
 
             running = false;
+
+            finishInput();
+
 
             runButton.disabled =
                 false;
@@ -2742,111 +2775,91 @@ await __pylite_main__()
             stopButton.disabled =
                 true;
 
+
+            writeConsoleLine(
+                "",
+                "normal"
+            );
+
+
+            writeConsoleLine(
+                ">>> Execution stopped.",
+                "error"
+            );
+
         }
 
-    }
 
-}
+        /* =========================================================
+           BUTTONS
+        ========================================================= */
 
-
-/* =========================================================
-   STOP
-========================================================= */
-
-function stopPython() {
-
-    executionID++;
-
-    running = false;
-
-    finishInput();
-
-    runButton.disabled =
-        false;
-
-    stopButton.disabled =
-        true;
+        runButton.addEventListener(
+            "click",
+            runPython
+        );
 
 
-    writeConsoleLine(
-        "",
-        "normal"
-    );
+        stopButton.addEventListener(
+            "click",
+            stopPython
+        );
 
 
-    writeConsoleLine(
-        ">>> Execution stopped.",
-        "error"
-    );
-
-}
+        clearButton.addEventListener(
+            "click",
+            clearConsole
+        );
 
 
-/* =========================================================
-   BUTTONS
-========================================================= */
+        /* =========================================================
+           KEYBOARD SHORTCUTS
+        ========================================================= */
 
-runButton.addEventListener(
-    "click",
-    runPython
-);
+        editor.commands.addCommand({
 
+            name: "runPython",
 
-stopButton.addEventListener(
-    "click",
-    stopPython
-);
+            bindKey: {
+                win: "Ctrl-Enter",
+                mac: "Command-Enter"
+            },
 
+            exec: function() {
 
-clearButton.addEventListener(
-    "click",
-    clearConsole
-);
+                runPython();
 
+            }
 
-/* =========================================================
-   KEYBOARD SHORTCUTS
-========================================================= */
-
-editor.commands.addCommand({
-
-    name: "runPython",
-
-    bindKey: {
-        win: "Ctrl-Enter",
-        mac: "Command-Enter"
-    },
-
-    exec: function() {
-        runPython();
-    }
-
-});
+        });
 
 
-editor.commands.addCommand({
+        editor.commands.addCommand({
 
-    name: "clearConsole",
+            name: "clearConsole",
 
-    bindKey: {
-        win: "Ctrl-L",
-        mac: "Command-L"
-    },
+            bindKey: {
+                win: "Ctrl-L",
+                mac: "Command-L"
+            },
 
-    exec: function() {
-        clearConsole();
-    }
+            exec: function() {
 
-});
+                clearConsole();
+
+            }
+
+        });
 
 
-/* =========================================================
-   START PYODIDE
-========================================================= */
+        /* =========================================================
+           START PYODIDE
+        ========================================================= */
 
-loadPython();
+        loadPython();
 
-</script>
+    </script>
 
 </body>
+
 </html>
