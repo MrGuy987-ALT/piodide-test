@@ -3,30 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/x-icon" href="images/python.png">
-<title>PyLite Python IDE</title>
 
-<!-- =========================================================
-     PYODIDE
-========================================================= -->
+<title>PyLite</title>
 
 <script src="https://cdn.jsdelivr.net/pyodide/v0.28.2/full/pyodide.js"></script>
-
-
-<!-- =========================================================
-     ACE EDITOR
-========================================================= -->
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.43.2/ace.js"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.43.2/ext-language_tools.min.js"></script>
 
-
 <style>
-
-/* =========================================================
-   GLOBAL
-========================================================= */
 
 * {
     box-sizing: border-box;
@@ -34,24 +18,16 @@
 
 html,
 body {
-
     width: 100%;
     height: 100%;
-
     margin: 0;
-
     overflow: hidden;
-
 }
 
 body {
-
-    background: #1e1e2e;
-
-    color: #cdd6f4;
-
+    background: #1a1b26;
+    color: #c0caf5;
     font-family: Arial, sans-serif;
-
 }
 
 
@@ -60,134 +36,101 @@ body {
 ========================================================= */
 
 .topbar {
-
-    height: 58px;
+    height: 56px;
 
     display: flex;
-
     align-items: center;
 
     gap: 8px;
 
-    padding: 0 15px;
+    padding: 0 14px;
 
-    background: #181825;
+    background: #16161e;
 
-    border-bottom: 1px solid #313244;
-
+    border-bottom: 1px solid #292e42;
 }
 
 .logo {
-
     margin-right: auto;
 
-    color: #89b4fa;
+    color: #7aa2f7;
 
     font-size: 19px;
-
     font-weight: bold;
-
 }
 
 .status {
-
-    color: #6c7086;
+    color: #565f89;
 
     font-size: 12px;
 
     margin-right: 8px;
-
 }
 
 button {
-
     border: 0;
-
     border-radius: 6px;
 
     padding: 8px 14px;
 
-    background: #89b4fa;
+    background: #7aa2f7;
 
-    color: #11111b;
+    color: #16161e;
 
-    font-weight: 600;
+    font-weight: bold;
 
     cursor: pointer;
-
 }
 
 button:hover {
-
-    background: #b4befe;
-
+    background: #89b4fa;
 }
 
 button:disabled {
-
     opacity: .45;
-
     cursor: default;
-
 }
 
 .stop {
-
-    background: #f38ba8;
-
+    background: #f7768e;
 }
 
 .stop:hover {
-
-    background: #eba0ac;
-
+    background: #ff899d;
 }
 
 .clear {
-
-    background: #313244;
-
-    color: #cdd6f4;
-
+    background: #292e42;
+    color: #c0caf5;
 }
 
 .clear:hover {
-
-    background: #45475a;
-
+    background: #414868;
 }
 
 
 /* =========================================================
-   MAIN WORKSPACE
+   WORKSPACE
 ========================================================= */
 
 .workspace {
-
-    height: calc(100vh - 58px);
+    height: calc(100vh - 56px);
 
     display: grid;
 
     grid-template-columns: 1fr 1fr;
-
 }
 
 .panel {
-
     min-width: 0;
-
     min-height: 0;
 
     display: flex;
-
     flex-direction: column;
-
 }
 
 .panel + .panel {
-
-    border-left: 1px solid #313244;
-
+    border-left: 1px solid #292e42;
 }
 
 
@@ -196,31 +139,28 @@ button:disabled {
 ========================================================= */
 
 .panel-header {
-
-    height: 39px;
+    height: 38px;
 
     flex-shrink: 0;
 
     display: flex;
-
     align-items: center;
 
     padding: 0 14px;
 
-    background: #181825;
+    background: #16161e;
 
-    border-bottom: 1px solid #313244;
+    border-bottom: 1px solid #292e42;
 
-    color: #7f849c;
+    color: #565f89;
 
     font-size: 11px;
 
     font-weight: bold;
 
-    text-transform: uppercase;
-
     letter-spacing: .8px;
 
+    text-transform: uppercase;
 }
 
 
@@ -229,28 +169,22 @@ button:disabled {
 ========================================================= */
 
 #editor {
-
     flex: 1;
 
     width: 100%;
-
     height: 100%;
-
 }
 
 
 /* =========================================================
-   RIGHT PANEL
+   RIGHT SIDE
 ========================================================= */
 
 .right-panel {
-
     min-height: 0;
 
     display: flex;
-
     flex-direction: column;
-
 }
 
 
@@ -259,55 +193,43 @@ button:disabled {
 ========================================================= */
 
 .tabs {
-
     height: 40px;
 
     flex-shrink: 0;
 
     display: flex;
 
-    align-items: stretch;
+    background: #16161e;
 
-    background: #181825;
-
-    border-bottom: 1px solid #313244;
-
+    border-bottom: 1px solid #292e42;
 }
 
 .tab {
+    display: flex;
+    align-items: center;
 
     padding: 0 15px;
 
-    display: flex;
-
-    align-items: center;
-
-    color: #6c7086;
+    color: #565f89;
 
     font-size: 12px;
 
     cursor: pointer;
 
-    border-right: 1px solid #313244;
-
+    border-right: 1px solid #292e42;
 }
 
 .tab:hover {
-
-    color: #cdd6f4;
-
-    background: #1e1e2e;
-
+    color: #c0caf5;
+    background: #1a1b26;
 }
 
 .tab.active {
+    color: #7aa2f7;
 
-    color: #89b4fa;
+    background: #1a1b26;
 
-    background: #1e1e2e;
-
-    border-bottom: 2px solid #89b4fa;
-
+    border-bottom: 2px solid #7aa2f7;
 }
 
 
@@ -316,19 +238,15 @@ button:disabled {
 ========================================================= */
 
 .view {
-
     display: none;
 
     flex: 1;
 
     min-height: 0;
-
 }
 
 .view.active {
-
     display: flex;
-
 }
 
 
@@ -337,15 +255,12 @@ button:disabled {
 ========================================================= */
 
 .console-view {
-
     flex-direction: column;
 
-    background: #11111b;
-
+    background: #101014;
 }
 
 #console {
-
     flex: 1;
 
     min-height: 0;
@@ -353,6 +268,10 @@ button:disabled {
     padding: 14px 16px;
 
     overflow-y: auto;
+
+    white-space: pre-wrap;
+
+    word-break: break-word;
 
     font-family:
         "Cascadia Code",
@@ -363,41 +282,26 @@ button:disabled {
     font-size: 14px;
 
     line-height: 1.55;
-
-    white-space: pre-wrap;
-
-    word-break: break-word;
-
 }
 
 .console-line {
-
     white-space: pre-wrap;
-
 }
 
 .normal {
-
-    color: #cdd6f4;
-
+    color: #c0caf5;
 }
 
 .system {
-
-    color: #6c7086;
-
+    color: #565f89;
 }
 
 .error {
-
-    color: #f38ba8;
-
+    color: #f7768e;
 }
 
 .input-output {
-
-    color: #a6e3a1;
-
+    color: #9ece6a;
 }
 
 
@@ -406,57 +310,48 @@ button:disabled {
 ========================================================= */
 
 .input-area {
-
     display: none;
 
     padding: 9px 13px;
 
-    border-top: 1px solid #313244;
+    background: #16161e;
 
-    background: #181825;
-
+    border-top: 1px solid #292e42;
 }
 
 .input-row {
-
     display: flex;
 
     align-items: center;
 
     gap: 8px;
-
 }
 
 .input-prompt {
-
-    color: #89b4fa;
+    color: #7aa2f7;
 
     font-family:
         "Cascadia Code",
         Consolas,
         monospace;
-
-    white-space: nowrap;
-
 }
 
 #consoleInput {
-
     flex: 1;
 
     min-width: 0;
 
     padding: 7px 9px;
 
-    border: 1px solid #45475a;
+    border: 1px solid #414868;
 
     border-radius: 5px;
 
     outline: none;
 
-    background: #11111b;
+    background: #101014;
 
-    color: #a6e3a1;
+    color: #9ece6a;
 
     font-family:
         "Cascadia Code",
@@ -464,13 +359,10 @@ button:disabled {
         monospace;
 
     font-size: 14px;
-
 }
 
 #consoleInput:focus {
-
-    border-color: #89b4fa;
-
+    border-color: #7aa2f7;
 }
 
 
@@ -479,99 +371,67 @@ button:disabled {
 ========================================================= */
 
 .turtle-view {
-
     position: relative;
 
     align-items: center;
-
     justify-content: center;
 
-    background: #11111b;
-
+    background: #101014;
 }
 
-
-/*
- * Two canvas layers:
- *
- * Bottom = drawing
- * Top    = turtle
- *
- * This prevents old turtle sprites
- * from being left behind.
- */
-
 .turtle-stage {
-
     position: relative;
 
     width: 700px;
-
     height: 500px;
 
     max-width: 95%;
-
     max-height: 95%;
 
     box-shadow:
-        0 10px 35px rgba(0,0,0,.4);
-
+        0 10px 35px rgba(0,0,0,.45);
 }
 
 .turtle-stage canvas {
-
     position: absolute;
 
     left: 0;
-
     top: 0;
 
     width: 100%;
-
     height: 100%;
-
 }
 
 #turtleDrawingCanvas {
-
     background: white;
-
 }
 
 #turtleCanvas {
-
     pointer-events: none;
-
 }
 
 
 /* =========================================================
-   GENERAL CANVAS
+   CANVAS
 ========================================================= */
 
 .canvas-view {
-
     position: relative;
 
     align-items: center;
-
     justify-content: center;
 
-    background: #11111b;
-
+    background: #101014;
 }
 
 #pythonCanvas {
+    max-width: 95%;
+    max-height: 95%;
 
     background: white;
 
-    max-width: 95%;
-
-    max-height: 95%;
-
     box-shadow:
-        0 10px 35px rgba(0,0,0,.4);
-
+        0 10px 35px rgba(0,0,0,.45);
 }
 
 
@@ -580,21 +440,14 @@ button:disabled {
 ========================================================= */
 
 .web-view {
-
     background: white;
-
 }
 
 #webFrame {
-
     width: 100%;
-
     height: 100%;
 
     border: 0;
-
-    background: white;
-
 }
 
 
@@ -605,33 +458,23 @@ button:disabled {
 @media (max-width: 800px) {
 
     body {
-
         overflow: auto;
-
     }
 
     .workspace {
-
-        height: calc(100vh - 58px);
+        height: calc(100vh - 56px);
 
         grid-template-columns: 1fr;
-
         grid-template-rows: 1fr 1fr;
-
     }
 
     .panel + .panel {
-
         border-left: 0;
-
-        border-top: 1px solid #313244;
-
+        border-top: 1px solid #292e42;
     }
 
     .status {
-
         display: none;
-
     }
 
 }
@@ -644,7 +487,7 @@ button:disabled {
 
 
 <!-- =========================================================
-     TOP BAR
+     HEADER
 ========================================================= -->
 
 <header class="topbar">
@@ -653,7 +496,6 @@ button:disabled {
         PyLite
     </div>
 
-
     <div
         class="status"
         id="status"
@@ -661,14 +503,9 @@ button:disabled {
         Loading Python...
     </div>
 
-
-    <button
-        id="runButton"
-        disabled
-    >
+    <button id="runButton" disabled>
         Run
     </button>
-
 
     <button
         id="stopButton"
@@ -677,7 +514,6 @@ button:disabled {
     >
         Stop
     </button>
-
 
     <button
         id="clearButton"
@@ -690,14 +526,14 @@ button:disabled {
 
 
 <!-- =========================================================
-     WORKSPACE
+     MAIN
 ========================================================= -->
 
 <main class="workspace">
 
 
     <!-- =====================================================
-         PYTHON EDITOR
+         EDITOR
     ====================================================== -->
 
     <section class="panel">
@@ -712,7 +548,7 @@ button:disabled {
 
 
     <!-- =====================================================
-         RIGHT PANEL
+         OUTPUT
     ====================================================== -->
 
     <section class="panel right-panel">
@@ -724,14 +560,12 @@ button:disabled {
 
         <div class="tabs">
 
-
             <div
                 class="tab active"
                 data-view="consoleView"
             >
                 Console
             </div>
-
 
             <div
                 class="tab"
@@ -740,7 +574,6 @@ button:disabled {
                 Turtle
             </div>
 
-
             <div
                 class="tab"
                 data-view="canvasView"
@@ -748,14 +581,12 @@ button:disabled {
                 Canvas
             </div>
 
-
             <div
                 class="tab"
                 data-view="webView"
             >
                 Web
             </div>
-
 
         </div>
 
@@ -771,7 +602,6 @@ button:disabled {
 
             <div id="console"></div>
 
-
             <div
                 class="input-area"
                 id="inputArea"
@@ -785,7 +615,6 @@ button:disabled {
                     >
                         &gt;&gt;&gt;
                     </span>
-
 
                     <input
                         id="consoleInput"
@@ -811,16 +640,11 @@ button:disabled {
 
             <div class="turtle-stage">
 
-                <!-- Drawing layer -->
-
                 <canvas
                     id="turtleDrawingCanvas"
                     width="700"
                     height="500"
                 ></canvas>
-
-
-                <!-- Turtle layer -->
 
                 <canvas
                     id="turtleCanvas"
@@ -834,7 +658,7 @@ button:disabled {
 
 
         <!-- =================================================
-             GENERAL CANVAS
+             CANVAS
         ================================================== -->
 
         <div
@@ -877,7 +701,7 @@ button:disabled {
 
 
 /* =========================================================
-   GLOBAL VARIABLES
+   GLOBALS
 ========================================================= */
 
 let pyodide = null;
@@ -892,36 +716,29 @@ let inputResolver = null;
 
 
 /* =========================================================
-   DOM ELEMENTS
+   DOM
 ========================================================= */
 
 const consoleElement =
     document.getElementById("console");
 
-
 const consoleInput =
     document.getElementById("consoleInput");
-
 
 const inputArea =
     document.getElementById("inputArea");
 
-
 const inputPrompt =
     document.getElementById("inputPrompt");
-
 
 const runButton =
     document.getElementById("runButton");
 
-
 const stopButton =
     document.getElementById("stopButton");
 
-
 const clearButton =
     document.getElementById("clearButton");
-
 
 const status =
     document.getElementById("status");
@@ -935,55 +752,33 @@ document
     .querySelectorAll(".tab")
     .forEach(tab => {
 
-        tab.addEventListener(
-            "click",
-            () => {
+        tab.addEventListener("click", () => {
 
+            document
+                .querySelectorAll(".tab")
+                .forEach(t => {
+                    t.classList.remove("active");
+                });
 
-                document
-                    .querySelectorAll(".tab")
-                    .forEach(
-                        t =>
-                            t.classList.remove(
-                                "active"
-                            )
-                    );
+            document
+                .querySelectorAll(".view")
+                .forEach(v => {
+                    v.classList.remove("active");
+                });
 
+            tab.classList.add("active");
 
-                document
-                    .querySelectorAll(".view")
-                    .forEach(
-                        v =>
-                            v.classList.remove(
-                                "active"
-                            )
-                    );
+            document
+                .getElementById(tab.dataset.view)
+                .classList.add("active");
 
-
-                tab.classList.add(
-                    "active"
-                );
-
-
-                const target =
-                    document.getElementById(
-                        tab.dataset.view
-                    );
-
-
-                target.classList.add(
-                    "active"
-                );
-
-
-            }
-        );
+        });
 
     });
 
 
 /* =========================================================
-   ACE THEME
+   ACE EDITOR
 ========================================================= */
 
 ace.define(
@@ -995,120 +790,117 @@ ace.define(
     ],
     function(
         require,
-        exports,
-        module
+        exports
     ) {
-
 
         exports.isDark = true;
 
         exports.cssClass =
             "ace-pylite";
 
-
         exports.cssText = `
 
         .ace-pylite {
-            background: #1e1e2e;
-            color: #cdd6f4;
+            background: #1a1b26;
+            color: #c0caf5;
         }
 
         .ace-pylite .ace_gutter {
-            background: #181825;
-            color: #585b70;
+            background: #16161e;
+            color: #565f89;
         }
 
         .ace-pylite .ace_print-margin {
-            background: #313244;
+            background: #292e42;
         }
 
         .ace-pylite .ace_cursor {
-            color: #f5e0e0;
+            color: #c0caf5;
         }
 
         .ace-pylite
         .ace_marker-layer
         .ace_selection {
-            background: #45475a;
+            background: #33467c;
         }
 
         .ace-pylite
         .ace_marker-layer
         .ace_active-line {
-            background: #242435;
+            background: #1f2335;
         }
 
-        .ace-pylite .ace_gutter-active-line {
-            background: #242435;
-            color: #cdd6f4;
+        .ace-pylite
+        .ace_gutter-active-line {
+            background: #1f2335;
+            color: #c0caf5;
         }
 
         .ace-pylite .ace_keyword {
-            color: #cba6f7;
+            color: #bb9af7;
         }
 
         .ace-pylite
         .ace_keyword.ace_operator {
-            color: #89dceb;
+            color: #89ddff;
         }
 
         .ace-pylite .ace_constant {
-            color: #fab387;
+            color: #ff9e64;
         }
 
         .ace-pylite
         .ace_constant.ace_numeric {
-            color: #fab387;
+            color: #ff9e64;
         }
 
         .ace-pylite .ace_string {
-            color: #a6e3a1;
+            color: #9ece6a;
         }
 
         .ace-pylite .ace_comment {
-            color: #6c7086;
+            color: #565f89;
             font-style: italic;
         }
 
         .ace-pylite
         .ace_support.ace_function {
-            color: #89b4fa;
+            color: #7aa2f7;
         }
 
         .ace-pylite
         .ace_entity.ace_name.ace_function {
-            color: #89b4fa;
+            color: #7aa2f7;
         }
 
         .ace-pylite
         .ace_support.ace_class {
-            color: #f9e2af;
+            color: #e0af68;
         }
 
         .ace-pylite
         .ace_entity.ace_name.ace_class {
-            color: #f9e2af;
+            color: #e0af68;
         }
 
         .ace-pylite .ace_variable {
-            color: #cdd6f4;
+            color: #c0caf5;
         }
 
         .ace-pylite
         .ace_variable.ace_parameter {
-            color: #f2cdcd;
+            color: #f7768e;
         }
 
         .ace-pylite .ace_meta {
-            color: #f9e2af;
+            color: #e0af68;
         }
 
         .ace-pylite .ace_invalid {
-            color: #f38ba8;
+            color: #f7768e;
         }
 
         `;
-
 
         require(
             "ace/lib/dom"
@@ -1121,23 +913,15 @@ ace.define(
 );
 
 
-/* =========================================================
-   CREATE EDITOR
-========================================================= */
-
-editor =
-    ace.edit("editor");
-
+editor = ace.edit("editor");
 
 editor.setTheme(
     "ace/theme/pylite"
 );
 
-
 editor.session.setMode(
     "ace/mode/python"
 );
-
 
 editor.setOptions({
 
@@ -1174,7 +958,7 @@ editor.setOptions({
    AUTOCOMPLETE
 ========================================================= */
 
-const pythonKeywords = [
+const pythonWords = [
 
     "and",
     "as",
@@ -1182,7 +966,6 @@ const pythonKeywords = [
     "async",
     "await",
     "break",
-    "case",
     "class",
     "continue",
     "def",
@@ -1190,6 +973,7 @@ const pythonKeywords = [
     "elif",
     "else",
     "except",
+    "False",
     "finally",
     "for",
     "from",
@@ -1200,7 +984,6 @@ const pythonKeywords = [
     "is",
     "lambda",
     "None",
-    "nonlocal",
     "not",
     "or",
     "pass",
@@ -1208,50 +991,28 @@ const pythonKeywords = [
     "return",
     "True",
     "try",
-    "type",
     "while",
     "with",
-    "yield"
-
-];
-
-
-const pythonBuiltins = [
+    "yield",
 
     "abs",
     "all",
     "any",
     "bool",
-    "bytes",
-    "callable",
-    "chr",
     "dict",
-    "dir",
     "enumerate",
     "filter",
     "float",
-    "format",
-    "getattr",
-    "hasattr",
-    "help",
-    "id",
     "input",
     "int",
-    "isinstance",
-    "iter",
     "len",
     "list",
     "map",
     "max",
     "min",
-    "next",
-    "object",
     "open",
-    "pow",
     "print",
     "range",
-    "repr",
-    "reversed",
     "round",
     "set",
     "sorted",
@@ -1259,12 +1020,7 @@ const pythonBuiltins = [
     "sum",
     "tuple",
     "type",
-    "zip"
-
-];
-
-
-const pythonModules = [
+    "zip",
 
     "math",
     "random",
@@ -1273,25 +1029,12 @@ const pythonModules = [
     "os",
     "sys",
     "time",
-    "statistics",
-    "re",
-    "collections",
-    "itertools",
-    "functools",
-    "decimal",
-    "fractions",
-    "pathlib",
     "turtle"
 
 ];
 
 
 const pythonCompleter = {
-
-    identifierRegexps: [
-        /[a-zA-Z_][a-zA-Z0-9_]*/
-    ],
-
 
     getCompletions:
     function(
@@ -1302,65 +1045,23 @@ const pythonCompleter = {
         callback
     ) {
 
-
         const results = [];
 
+        pythonWords.forEach(word => {
 
-        pythonKeywords.forEach(
-            word => {
+            results.push({
 
-                results.push({
+                caption: word,
 
-                    caption: word,
+                value: word,
 
-                    value: word,
+                meta: "python",
 
-                    meta: "keyword",
+                score: 1000
 
-                    score: 900
+            });
 
-                });
-
-            }
-        );
-
-
-        pythonBuiltins.forEach(
-            word => {
-
-                results.push({
-
-                    caption: word,
-
-                    value: word,
-
-                    meta: "builtin",
-
-                    score: 800
-
-                });
-
-            }
-        );
-
-
-        pythonModules.forEach(
-            word => {
-
-                results.push({
-
-                    caption: word,
-
-                    value: word,
-
-                    meta: "module",
-
-                    score: 700
-
-                });
-
-            }
-        );
+        });
 
 
         const code =
@@ -1373,9 +1074,7 @@ const pythonCompleter = {
             );
 
 
-        for (
-            const match of definitions
-        ) {
+        for (const match of definitions) {
 
             results.push({
 
@@ -1385,7 +1084,7 @@ const pythonCompleter = {
 
                 meta: "defined",
 
-                score: 950
+                score: 1200
 
             });
 
@@ -1398,9 +1097,7 @@ const pythonCompleter = {
             );
 
 
-        for (
-            const match of variables
-        ) {
+        for (const match of variables) {
 
             results.push({
 
@@ -1410,7 +1107,7 @@ const pythonCompleter = {
 
                 meta: "variable",
 
-                score: 850
+                score: 1100
 
             });
 
@@ -1457,19 +1154,15 @@ function writeConsole(
     const line =
         document.createElement("div");
 
-
     line.className =
         "console-line " + type;
-
 
     line.textContent =
         text;
 
-
     consoleElement.appendChild(
         line
     );
-
 
     consoleElement.scrollTop =
         consoleElement.scrollHeight;
@@ -1491,36 +1184,28 @@ function writeConsoleLine(
 
 
 /* =========================================================
-   CONSOLE INPUT
+   INPUT
 ========================================================= */
 
 function requestInput(
     promptText
 ) {
 
-    return new Promise(
-        resolve => {
+    return new Promise(resolve => {
 
-            inputResolver =
-                resolve;
+        inputResolver = resolve;
 
+        inputPrompt.textContent =
+            String(promptText || ">>>");
 
-            inputPrompt.textContent =
-                promptText || ">>>";
+        inputArea.style.display =
+            "block";
 
+        consoleInput.value = "";
 
-            inputArea.style.display =
-                "block";
+        consoleInput.focus();
 
-
-            consoleInput.value =
-                "";
-
-
-            consoleInput.focus();
-
-        }
-    );
+    });
 
 }
 
@@ -1537,42 +1222,28 @@ consoleInput.addEventListener(
     "keydown",
     event => {
 
-
-        if (
-            event.key !== "Enter"
-        ) {
-
+        if (event.key !== "Enter") {
             return;
-
         }
-
 
         const value =
             consoleInput.value;
-
 
         writeConsole(
             value,
             "input-output"
         );
 
-
         finishInput();
 
+        if (inputResolver) {
 
-        if (
-            inputResolver
-        ) {
-
-            const resolver =
+            const resolve =
                 inputResolver;
 
+            inputResolver = null;
 
-            inputResolver =
-                null;
-
-
-            resolver(value);
+            resolve(value);
 
         }
 
@@ -1581,7 +1252,7 @@ consoleInput.addEventListener(
 
 
 /* =========================================================
-   TURTLE CANVASES
+   TURTLE CANVAS
 ========================================================= */
 
 const turtleDrawingCanvas =
@@ -1589,18 +1260,15 @@ const turtleDrawingCanvas =
         "turtleDrawingCanvas"
     );
 
-
 const turtleDrawingCtx =
     turtleDrawingCanvas.getContext(
         "2d"
     );
 
-
 const turtleCanvas =
     document.getElementById(
         "turtleCanvas"
     );
-
 
 const turtleCtx =
     turtleCanvas.getContext(
@@ -1617,7 +1285,6 @@ const pythonCanvas =
         "pythonCanvas"
     );
 
-
 const pythonCtx =
     pythonCanvas.getContext(
         "2d"
@@ -1626,9 +1293,15 @@ const pythonCtx =
 
 function clearPythonCanvas() {
 
+    pythonCtx.clearRect(
+        0,
+        0,
+        pythonCanvas.width,
+        pythonCanvas.height
+    );
+
     pythonCtx.fillStyle =
         "white";
-
 
     pythonCtx.fillRect(
         0,
@@ -1644,55 +1317,47 @@ clearPythonCanvas();
 
 
 /* =========================================================
-   BROWSER TURTLE
+   TURTLE ENGINE
 ========================================================= */
 
 class BrowserTurtle {
 
-
     constructor() {
 
-        this.x =
-            turtleDrawingCanvas.width / 2;
-
-
-        this.y =
-            turtleDrawingCanvas.height / 2;
-
-
-        this.angle = 0;
-
-
-        this.pen = true;
-
-
-        this.colorValue =
-            "#000000";
-
-
-        this.widthValue = 1;
-
-
-        this.visible = true;
-
-
-        this.speedValue = 0;
-
-
-        this.resetCanvas();
-
-
-        this.drawTurtle();
+        this.reset();
 
     }
 
 
     /* -----------------------------------------------------
-       RESET DRAWING
+       RESET
     ----------------------------------------------------- */
 
-    resetCanvas() {
+    reset() {
 
+        this.x =
+            turtleDrawingCanvas.width / 2;
+
+        this.y =
+            turtleDrawingCanvas.height / 2;
+
+        this.angle = 0;
+
+        this.pen = true;
+
+        this.colorValue =
+            "#000000";
+
+        this.widthValue = 1;
+
+        this.visible = true;
+
+        this.speedValue = 0;
+
+
+        /*
+         * Clear drawing layer.
+         */
 
         turtleDrawingCtx.clearRect(
             0,
@@ -1702,9 +1367,12 @@ class BrowserTurtle {
         );
 
 
+        /*
+         * White background.
+         */
+
         turtleDrawingCtx.fillStyle =
             "white";
-
 
         turtleDrawingCtx.fillRect(
             0,
@@ -1714,13 +1382,29 @@ class BrowserTurtle {
         );
 
 
-        this.clearTurtleOverlay();
+        /*
+         * Clear turtle layer.
+         */
+
+        turtleCtx.clearRect(
+            0,
+            0,
+            turtleCanvas.width,
+            turtleCanvas.height
+        );
+
+
+        /*
+         * Draw exactly ONE turtle.
+         */
+
+        this.drawTurtle();
 
     }
 
 
     /* -----------------------------------------------------
-       CLEAR TURTLE ONLY
+       CLEAR TURTLE OVERLAY
     ----------------------------------------------------- */
 
     clearTurtleOverlay() {
@@ -1736,10 +1420,96 @@ class BrowserTurtle {
 
 
     /* -----------------------------------------------------
-       FORWARD
+       DRAW TURTLE
+    ----------------------------------------------------- */
+
+    drawTurtle() {
+
+        /*
+         * This is the key fix.
+         *
+         * We clear ONLY the top layer.
+         *
+         * The actual drawing remains untouched.
+         */
+
+        this.clearTurtleOverlay();
+
+
+        if (!this.visible) {
+            return;
+        }
+
+
+        turtleCtx.save();
+
+
+        turtleCtx.translate(
+            this.x,
+            this.y
+        );
+
+
+        turtleCtx.rotate(
+            -this.angle *
+            Math.PI /
+            180
+        );
+
+
+        turtleCtx.beginPath();
+
+        turtleCtx.moveTo(
+            16,
+            0
+        );
+
+        turtleCtx.lineTo(
+            -10,
+            -9
+        );
+
+        turtleCtx.lineTo(
+            -7,
+            0
+        );
+
+        turtleCtx.lineTo(
+            -10,
+            9
+        );
+
+        turtleCtx.closePath();
+
+
+        turtleCtx.fillStyle =
+            "#7aa2f7";
+
+        turtleCtx.fill();
+
+
+        turtleCtx.strokeStyle =
+            "#16161e";
+
+        turtleCtx.lineWidth =
+            1.5;
+
+        turtleCtx.stroke();
+
+
+        turtleCtx.restore();
+
+    }
+
+
+    /* -----------------------------------------------------
+       MOVE
     ----------------------------------------------------- */
 
     forward(distance) {
+
+        distance =
+            Number(distance);
 
 
         const radians =
@@ -1762,33 +1532,26 @@ class BrowserTurtle {
 
         if (this.pen) {
 
-
             turtleDrawingCtx.beginPath();
-
 
             turtleDrawingCtx.moveTo(
                 this.x,
                 this.y
             );
 
-
             turtleDrawingCtx.lineTo(
                 nx,
                 ny
             );
 
-
             turtleDrawingCtx.strokeStyle =
                 this.colorValue;
-
 
             turtleDrawingCtx.lineWidth =
                 this.widthValue;
 
-
             turtleDrawingCtx.lineCap =
                 "round";
-
 
             turtleDrawingCtx.stroke();
 
@@ -1805,51 +1568,76 @@ class BrowserTurtle {
     }
 
 
-    /* -----------------------------------------------------
-       BACKWARD
-    ----------------------------------------------------- */
+    fd(distance) {
+
+        this.forward(distance);
+
+    }
+
 
     backward(distance) {
 
         this.forward(
-            -distance
+            -Number(distance)
         );
 
     }
 
 
+    bk(distance) {
+
+        this.backward(distance);
+
+    }
+
+
+    back(distance) {
+
+        this.backward(distance);
+
+    }
+
+
     /* -----------------------------------------------------
-       LEFT
+       ROTATION
     ----------------------------------------------------- */
 
     left(degrees) {
 
         this.angle +=
-            degrees;
-
+            Number(degrees);
 
         this.drawTurtle();
 
     }
 
 
-    /* -----------------------------------------------------
-       RIGHT
-    ----------------------------------------------------- */
+    lt(degrees) {
+
+        this.left(degrees);
+
+    }
+
 
     right(degrees) {
 
         this.angle -=
-            degrees;
-
+            Number(degrees);
 
         this.drawTurtle();
 
     }
 
 
+    rt(degrees) {
+
+        this.right(degrees);
+
+    }
+
+
     /* -----------------------------------------------------
-       PEN UP
+       PEN
     ----------------------------------------------------- */
 
     penup() {
@@ -1859,9 +1647,12 @@ class BrowserTurtle {
     }
 
 
-    /* -----------------------------------------------------
-       PEN DOWN
-    ----------------------------------------------------- */
+    pu() {
+
+        this.penup();
+
+    }
+
 
     pendown() {
 
@@ -1870,48 +1661,66 @@ class BrowserTurtle {
     }
 
 
+    pd() {
+
+        this.pendown();
+
+    }
+
+
     /* -----------------------------------------------------
-       GOTO
+       POSITION
     ----------------------------------------------------- */
 
     goto(x, y) {
 
+        if (
+            y === undefined
+        ) {
+
+            y = x[1];
+
+            x = x[0];
+
+        }
+
+
+        x = Number(x);
+        y = Number(y);
+
 
         const nx =
             turtleDrawingCanvas.width / 2 +
-            Number(x);
+            x;
 
 
         const ny =
             turtleDrawingCanvas.height / 2 -
-            Number(y);
+            y;
 
 
         if (this.pen) {
 
-
             turtleDrawingCtx.beginPath();
-
 
             turtleDrawingCtx.moveTo(
                 this.x,
                 this.y
             );
 
-
             turtleDrawingCtx.lineTo(
                 nx,
                 ny
             );
 
-
             turtleDrawingCtx.strokeStyle =
                 this.colorValue;
-
 
             turtleDrawingCtx.lineWidth =
                 this.widthValue;
 
+            turtleDrawingCtx.lineCap =
+                "round";
 
             turtleDrawingCtx.stroke();
 
@@ -1928,37 +1737,25 @@ class BrowserTurtle {
     }
 
 
-    /* -----------------------------------------------------
-       SET X
-    ----------------------------------------------------- */
-
     setx(x) {
 
         this.goto(
-            x,
+            Number(x),
             this.gety()
         );
 
     }
 
 
-    /* -----------------------------------------------------
-       SET Y
-    ----------------------------------------------------- */
-
     sety(y) {
 
         this.goto(
             this.getx(),
-            y
+            Number(y)
         );
 
     }
 
-
-    /* -----------------------------------------------------
-       GET X
-    ----------------------------------------------------- */
 
     getx() {
 
@@ -1970,10 +1767,6 @@ class BrowserTurtle {
     }
 
 
-    /* -----------------------------------------------------
-       GET Y
-    ----------------------------------------------------- */
-
     gety() {
 
         return (
@@ -1984,9 +1777,19 @@ class BrowserTurtle {
     }
 
 
-    /* -----------------------------------------------------
-       HOME
-    ----------------------------------------------------- */
+    xcor() {
+
+        return this.getx();
+
+    }
+
+
+    ycor() {
+
+        return this.gety();
+
+    }
+
 
     home() {
 
@@ -1995,9 +1798,7 @@ class BrowserTurtle {
             0
         );
 
-
         this.angle = 0;
-
 
         this.drawTurtle();
 
@@ -2013,25 +1814,36 @@ class BrowserTurtle {
         extent = 360
     ) {
 
+        radius =
+            Number(radius);
+
+        extent =
+            Number(extent);
+
 
         const steps =
             Math.max(
                 20,
-                Math.floor(
-                    Math.abs(extent)
+                Math.ceil(
+                    Math.abs(extent) *
+                    2
                 )
             );
 
 
-        const step =
+        const angleStep =
             extent / steps;
 
 
-        const distance =
+        const circumference =
             2 *
             Math.PI *
-            Math.abs(radius) *
-            Math.abs(step) /
+            Math.abs(radius);
+
+
+        const distance =
+            circumference *
+            Math.abs(angleStep) /
             360;
 
 
@@ -2041,9 +1853,9 @@ class BrowserTurtle {
             i++
         ) {
 
-
-            this.left(step);
-
+            this.left(
+                angleStep
+            );
 
             this.forward(
                 distance
@@ -2055,7 +1867,7 @@ class BrowserTurtle {
 
 
     /* -----------------------------------------------------
-       COLOR
+       COLOUR
     ----------------------------------------------------- */
 
     color(value) {
@@ -2088,8 +1900,7 @@ class BrowserTurtle {
 
     width(value) {
 
-        this.widthValue =
-            Number(value);
+        this.pensize(value);
 
     }
 
@@ -2100,7 +1911,6 @@ class BrowserTurtle {
 
     clear() {
 
-
         turtleDrawingCtx.clearRect(
             0,
             0,
@@ -2120,81 +1930,6 @@ class BrowserTurtle {
             turtleDrawingCanvas.height
         );
 
-
-        this.drawTurtle();
-
-    }
-
-
-    /* -----------------------------------------------------
-       FULL RESET
-    ----------------------------------------------------- */
-
-    reset() {
-
-
-        this.x =
-            turtleDrawingCanvas.width / 2;
-
-
-        this.y =
-            turtleDrawingCanvas.height / 2;
-
-
-        this.angle = 0;
-
-
-        this.pen = true;
-
-
-        this.colorValue =
-            "#000000";
-
-
-        this.widthValue = 1;
-
-
-        this.visible = true;
-
-
-        this.speedValue = 0;
-
-
-        /*
-         * Completely clear BOTH layers.
-         */
-
-        turtleDrawingCtx.clearRect(
-            0,
-            0,
-            turtleDrawingCanvas.width,
-            turtleDrawingCanvas.height
-        );
-
-
-        turtleCtx.clearRect(
-            0,
-            0,
-            turtleCanvas.width,
-            turtleCanvas.height
-        );
-
-
-        turtleDrawingCtx.fillStyle =
-            "white";
-
-
-        turtleDrawingCtx.fillRect(
-            0,
-            0,
-            turtleDrawingCanvas.width,
-            turtleDrawingCanvas.height
-        );
-
-
-        /*
-         * Draw exactly ONE turtle.
-         */
 
         this.drawTurtle();
 
@@ -2214,121 +1949,37 @@ class BrowserTurtle {
 
 
     /* -----------------------------------------------------
-       HIDE
+       VISIBILITY
     ----------------------------------------------------- */
 
     hideturtle() {
 
         this.visible = false;
 
-
         this.clearTurtleOverlay();
 
     }
 
 
-    /* -----------------------------------------------------
-       SHOW
-    ----------------------------------------------------- */
+    ht() {
+
+        this.hideturtle();
+
+    }
+
 
     showturtle() {
 
         this.visible = true;
-
 
         this.drawTurtle();
 
     }
 
 
-    /* -----------------------------------------------------
-       DRAW TURTLE
-    ----------------------------------------------------- */
+    st() {
 
-    drawTurtle() {
-
-
-        /*
-         * THIS IS THE IMPORTANT PART.
-         *
-         * The turtle canvas is ONLY the
-         * turtle overlay.
-         *
-         * Every time the turtle moves,
-         * we erase the old turtle first.
-         *
-         * The drawing canvas is untouched.
-         */
-
-        this.clearTurtleOverlay();
-
-
-        if (!this.visible) {
-
-            return;
-
-        }
-
-
-        turtleCtx.save();
-
-
-        turtleCtx.translate(
-            this.x,
-            this.y
-        );
-
-
-        turtleCtx.rotate(
-            -this.angle *
-            Math.PI /
-            180
-        );
-
-
-        turtleCtx.beginPath();
-
-
-        turtleCtx.moveTo(
-            15,
-            0
-        );
-
-
-        turtleCtx.lineTo(
-            -9,
-            -8
-        );
-
-
-        turtleCtx.lineTo(
-            -9,
-            8
-        );
-
-
-        turtleCtx.closePath();
-
-
-        turtleCtx.fillStyle =
-            "#20a0ff";
-
-
-        turtleCtx.fill();
-
-
-        turtleCtx.strokeStyle =
-            "#11111b";
-
-
-        turtleCtx.lineWidth =
-            1.5;
-
-
-        turtleCtx.stroke();
-
-
-        turtleCtx.restore();
+        this.showturtle();
 
     }
 
@@ -2336,12 +1987,11 @@ class BrowserTurtle {
 
 
 /* =========================================================
-   CREATE TURTLE
+   CREATE SINGLE TURTLE
 ========================================================= */
 
 const browserTurtle =
     new BrowserTurtle();
-
 
 window.pyLiteTurtle =
     browserTurtle;
@@ -2359,10 +2009,11 @@ const webFrame =
 
 function renderWeb(html) {
 
-
     const blob =
         new Blob(
-            [String(html)],
+            [
+                String(html)
+            ],
             {
                 type: "text/html"
             }
@@ -2370,9 +2021,7 @@ function renderWeb(html) {
 
 
     const url =
-        URL.createObjectURL(
-            blob
-        );
+        URL.createObjectURL(blob);
 
 
     webFrame.src =
@@ -2382,14 +2031,12 @@ function renderWeb(html) {
 
 
 /* =========================================================
-   PYODIDE
+   PYTHON INITIALISATION
 ========================================================= */
 
 async function loadPython() {
 
-
     try {
-
 
         status.textContent =
             "Loading Python...";
@@ -2399,10 +2046,9 @@ async function loadPython() {
             await loadPyodide();
 
 
-        /* -----------------------------------------------
-           STDOUT
-        ------------------------------------------------ */
-
+        /* -------------------------------------------------
+           OUTPUT
+        ------------------------------------------------- */
 
         pyodide.setStdout({
 
@@ -2416,11 +2062,6 @@ async function loadPython() {
             }
 
         });
-
-
-        /* -----------------------------------------------
-           STDERR
-        ------------------------------------------------ */
 
 
         pyodide.setStderr({
@@ -2437,27 +2078,23 @@ async function loadPython() {
         });
 
 
-        /* -----------------------------------------------
-           GLOBAL BRIDGES
-        ------------------------------------------------ */
-
+        /* -------------------------------------------------
+           JAVASCRIPT BRIDGES
+        ------------------------------------------------- */
 
         window.pyLiteInput =
             requestInput;
 
-
         window.pyLiteWeb =
             renderWeb;
-
 
         window.pyLiteTurtle =
             browserTurtle;
 
 
-        /* -----------------------------------------------
-           PYTHON COMPATIBILITY LAYER
-        ------------------------------------------------ */
-
+        /* -------------------------------------------------
+           PYTHON COMPATIBILITY
+        ------------------------------------------------- */
 
         await pyodide.runPythonAsync(`
 
@@ -2469,9 +2106,9 @@ from js import pyLiteWeb
 from js import pyLiteTurtle
 
 
-# =====================================================
+# =========================================================
 # INPUT
-# =====================================================
+# =========================================================
 
 async def _pylite_input(prompt=""):
 
@@ -2480,9 +2117,9 @@ async def _pylite_input(prompt=""):
     )
 
 
-# =====================================================
+# =========================================================
 # TURTLE MODULE
-# =====================================================
+# =========================================================
 
 turtle = types.ModuleType(
     "turtle"
@@ -2491,17 +2128,12 @@ turtle = types.ModuleType(
 
 class Turtle:
 
-
     def __init__(self):
 
-        self._turtle =
-            pyLiteTurtle
+        self._turtle = pyLiteTurtle
 
 
-    def forward(
-        self,
-        distance
-    ):
+    def forward(self, distance):
 
         self._turtle.forward(
             float(distance)
@@ -2511,10 +2143,7 @@ class Turtle:
     fd = forward
 
 
-    def backward(
-        self,
-        distance
-    ):
+    def backward(self, distance):
 
         self._turtle.backward(
             float(distance)
@@ -2522,14 +2151,10 @@ class Turtle:
 
 
     bk = backward
-
     back = backward
 
 
-    def left(
-        self,
-        degrees
-    ):
+    def left(self, degrees):
 
         self._turtle.left(
             float(degrees)
@@ -2539,10 +2164,7 @@ class Turtle:
     lt = left
 
 
-    def right(
-        self,
-        degrees
-    ):
+    def right(self, degrees):
 
         self._turtle.right(
             float(degrees)
@@ -2568,11 +2190,7 @@ class Turtle:
     pd = pendown
 
 
-    def goto(
-        self,
-        x,
-        y=None
-    ):
+    def goto(self, x, y=None):
 
         if y is None:
 
@@ -2586,24 +2204,17 @@ class Turtle:
 
 
     setpos = goto
-
     setposition = goto
 
 
-    def setx(
-        self,
-        x
-    ):
+    def setx(self, x):
 
         self._turtle.setx(
             float(x)
         )
 
 
-    def sety(
-        self,
-        y
-    ):
+    def sety(self, y):
 
         self._turtle.sety(
             float(y)
@@ -2612,12 +2223,12 @@ class Turtle:
 
     def xcor(self):
 
-        return self._turtle.getx()
+        return self._turtle.xcor()
 
 
     def ycor(self):
 
-        return self._turtle.gety()
+        return self._turtle.ycor()
 
 
     def home(self):
@@ -2633,45 +2244,37 @@ class Turtle:
 
         if extent is None:
 
-            extent = 360
+            self._turtle.circle(
+                float(radius)
+            )
+
+        else:
+
+            self._turtle.circle(
+                float(radius),
+                float(extent)
+            )
 
 
-        self._turtle.circle(
-            float(radius),
-            float(extent)
-        )
-
-
-    def color(
-        self,
-        color
-    ):
+    def color(self, value):
 
         self._turtle.color(
-            str(color)
+            str(value)
         )
 
 
-    def pencolor(
-        self,
-        color
-    ):
+    def pencolor(self, value):
 
         self._turtle.pencolor(
-            str(color)
+            str(value)
         )
 
 
-    def pensize(
-        self,
-        size=None
-    ):
+    def pensize(self, value):
 
-        if size is not None:
-
-            self._turtle.pensize(
-                float(size)
-            )
+        self._turtle.pensize(
+            float(value)
+        )
 
 
     width = pensize
@@ -2687,13 +2290,10 @@ class Turtle:
         self._turtle.reset()
 
 
-    def speed(
-        self,
-        speed
-    ):
+    def speed(self, value):
 
         self._turtle.speed(
-            float(speed)
+            float(value)
         )
 
 
@@ -2713,17 +2313,11 @@ class Turtle:
     st = showturtle
 
 
-turtle.Turtle =
-    Turtle
-
-
-# =====================================================
+# =========================================================
 # GLOBAL TURTLE
-# FUNCTIONS
-# =====================================================
+# =========================================================
 
-_turtle_instance =
-    Turtle()
+_turtle_instance = Turtle()
 
 
 def forward(distance):
@@ -2827,10 +2421,18 @@ def circle(
     extent=None
 ):
 
-    _turtle_instance.circle(
-        radius,
-        extent
-    )
+    if extent is None:
+
+        _turtle_instance.circle(
+            radius
+        )
+
+    else:
+
+        _turtle_instance.circle(
+            radius,
+            extent
+        )
 
 
 def color(value):
@@ -2888,9 +2490,11 @@ def showturtle():
     _turtle_instance.showturtle()
 
 
-# =====================================================
+# =========================================================
 # MODULE EXPORTS
-# =====================================================
+# =========================================================
+
+turtle.Turtle = Turtle
 
 turtle.forward = forward
 turtle.fd = fd
@@ -2930,36 +2534,11 @@ turtle.reset = reset
 
 turtle.speed = speed
 
-turtle.hideturtle =
-    hideturtle
-
-turtle.showturtle =
-    showturtle
+turtle.hideturtle = hideturtle
+turtle.showturtle = showturtle
 
 
-sys.modules["turtle"] =
-    turtle
-
-
-# =====================================================
-# WEB
-# =====================================================
-
-class Web:
-
-
-    def html(
-        self,
-        content
-    ):
-
-        pyLiteWeb(
-            str(content)
-        )
-
-
-web =
-    Web()
+sys.modules["turtle"] = turtle
 
         `);
 
@@ -2983,61 +2562,50 @@ web =
             "system"
         );
 
-
     }
 
     catch (error) {
 
-
         status.textContent =
             "Python failed to load";
-
 
         writeConsoleLine(
             String(error),
             "error"
         );
 
+        console.error(error);
+
     }
 
 }
 
 
 /* =========================================================
-   INPUT TRANSFORMATION
+   PYTHON CODE TRANSFORMATION
 ========================================================= */
 
-function transformInput(
-    code
-) {
-
+function transformInput(code) {
 
     /*
-     * Browser input() is asynchronous.
+     * Convert input() to our visible browser console.
      *
-     * Replace:
-     *
-     * input("Name: ")
-     *
-     * with:
-     *
-     * await _pylite_input("Name: ")
+     * We only transform simple input calls.
      */
 
     return code.replace(
         /\binput\s*\(/g,
-        "await _pylite_input("
+        "_pylite_input("
     );
 
 }
 
 
 /* =========================================================
-   RUN PYTHON
+   RUN
 ========================================================= */
 
 async function runPython() {
-
 
     if (
         !pyodide ||
@@ -3049,58 +2617,36 @@ async function runPython() {
     }
 
 
-    /*
-     * -----------------------------------------------
-     * CLEAR EVERYTHING FROM PREVIOUS RUN
-     * -----------------------------------------------
-     */
-
+    /* -----------------------------------------------------
+       NEW RUN = CLEAN EVERYTHING
+    ----------------------------------------------------- */
 
     clearConsole();
 
-
     finishInput();
-
 
     clearPythonCanvas();
 
-
     /*
-     * IMPORTANT:
+     * This is the important Turtle reset.
      *
-     * Completely reset the Turtle.
-     *
-     * This removes:
-     *
-     * - previous lines
-     * - previous turtle
-     * - previous position
-     * - previous colour
-     * - previous pen size
-     *
-     * and creates exactly ONE new turtle.
+     * It clears BOTH canvas layers and creates
+     * exactly one turtle at the centre.
      */
 
-
-    if (
-        window.pyLiteTurtle
-    ) {
-
-        window.pyLiteTurtle.reset();
-
-    }
+    browserTurtle.reset();
 
 
     running = true;
 
+    executionID++;
 
-    const id =
-        ++executionID;
+    const currentID =
+        executionID;
 
 
     runButton.disabled =
         true;
-
 
     stopButton.disabled =
         false;
@@ -3116,67 +2662,58 @@ async function runPython() {
         editor.getValue();
 
 
-    const start =
-        performance.now();
-
-
     try {
 
-
         const transformed =
-            transformInput(
-                code
-            );
+            transformInput(code);
+
+
+        /*
+         * We use a wrapper so input() can
+         * safely await the visible console.
+         */
+
+        const wrappedCode = `
+async def __pylite_main__():
+    exec(compile(${JSON.stringify(transformed)}, "<editor>", "exec"), globals())
+
+await __pylite_main__()
+`;
 
 
         await pyodide.runPythonAsync(
-            transformed
+            wrappedCode
         );
 
 
         if (
-            id !== executionID
+            currentID === executionID
         ) {
-
-            return;
-
-        }
-
-
-        const elapsed =
-            (
-                performance.now() -
-                start
-            ).toFixed(2);
-
-
-        writeConsoleLine(
-            "",
-            "normal"
-        );
-
-
-        writeConsoleLine(
-            `>>> Finished in ${elapsed} ms`,
-            "system"
-        );
-
-
-    }
-
-    catch (error) {
-
-
-        if (
-            id === executionID
-        ) {
-
 
             writeConsoleLine(
                 "",
                 "normal"
             );
 
+            writeConsoleLine(
+                ">>> Finished.",
+                "system"
+            );
+
+        }
+
+    }
+
+    catch (error) {
+
+        if (
+            currentID === executionID
+        ) {
+
+            writeConsoleLine(
+                "",
+                "normal"
+            );
 
             writeConsoleLine(
                 String(error),
@@ -3189,18 +2726,14 @@ async function runPython() {
 
     finally {
 
-
         if (
-            id === executionID
+            currentID === executionID
         ) {
-
 
             running = false;
 
-
             runButton.disabled =
                 false;
-
 
             stopButton.disabled =
                 true;
@@ -3218,19 +2751,14 @@ async function runPython() {
 
 function stopPython() {
 
-
     executionID++;
-
 
     running = false;
 
-
     finishInput();
-
 
     runButton.disabled =
         false;
-
 
     stopButton.disabled =
         true;
@@ -3281,17 +2809,12 @@ editor.commands.addCommand({
     name: "runPython",
 
     bindKey: {
-
         win: "Ctrl-Enter",
-
         mac: "Command-Enter"
-
     },
 
-    exec() {
-
+    exec: function() {
         runPython();
-
     }
 
 });
@@ -3302,44 +2825,19 @@ editor.commands.addCommand({
     name: "clearConsole",
 
     bindKey: {
-
         win: "Ctrl-L",
-
         mac: "Command-L"
-
     },
 
-    exec() {
-
+    exec: function() {
         clearConsole();
-
     }
 
 });
 
 
 /* =========================================================
-   STARTER CODE
-========================================================= */
-
-editor.setValue(
-`import turtle
-
-t = turtle.Turtle()
-
-t.color("blue")
-t.pensize(3)
-
-for i in range(4):
-    t.forward(150)
-    t.left(90)
-`,
--1
-);
-
-
-/* =========================================================
-   START PYTHON
+   START PYODIDE
 ========================================================= */
 
 loadPython();
