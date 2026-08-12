@@ -1,409 +1,1038 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>PyLite - Python Emulator</title>
+<title>PyLite</title>
 
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.28.2/full/pyodide.js"></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.28.2/full/pyodide.js"></script>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+<style>
+* {
+    box-sizing: border-box;
+}
 
-        body {
-            margin: 0;
-            background: #0f1117;
-            color: #e6e6e6;
-            font-family: Arial, sans-serif;
-            height: 100vh;
-            overflow: hidden;
-        }
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
 
-        .topbar {
-            height: 60px;
-            background: #171a22;
-            border-bottom: 1px solid #2a2f3a;
-            display: flex;
-            align-items: center;
-            padding: 0 18px;
-            gap: 15px;
-        }
+body {
+    background: #1a1b26;
+    color: #c0caf5;
+    font-family: Arial, sans-serif;
+}
 
-        .logo {
-            font-size: 20px;
-            font-weight: bold;
-            margin-right: auto;
-        }
+/* =========================
+   TOP BAR
+========================= */
 
-        .status {
-            font-size: 13px;
-            color: #999;
-        }
+.topbar {
+    height: 58px;
+    background: #16161e;
+    border-bottom: 1px solid #292e42;
 
-        button {
-            border: none;
-            border-radius: 6px;
-            padding: 9px 16px;
-            font-size: 14px;
-            cursor: pointer;
-            background: #2d6cdf;
-            color: white;
-        }
+    display: flex;
+    align-items: center;
 
-        button:hover {
-            background: #3d7bec;
-        }
+    padding: 0 16px;
+    gap: 10px;
+}
 
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+.logo {
+    font-size: 19px;
+    font-weight: bold;
+    color: #7aa2f7;
 
-        .stop {
-            background: #c83c3c;
-        }
+    margin-right: auto;
+}
 
-        .stop:hover {
-            background: #e04747;
-        }
+.status {
+    color: #565f89;
+    font-size: 13px;
+    margin-right: 8px;
+}
 
-        .clear {
-            background: #292e38;
-        }
+button {
+    border: 0;
+    border-radius: 6px;
 
-        .workspace {
-            height: calc(100vh - 60px);
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-        }
+    padding: 8px 15px;
 
-        .panel {
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-        }
+    background: #7aa2f7;
+    color: #1a1b26;
 
-        .panel + .panel {
-            border-left: 1px solid #2a2f3a;
-        }
+    font-weight: bold;
+    cursor: pointer;
+}
 
-        .panel-header {
-            height: 42px;
-            background: #171a22;
-            border-bottom: 1px solid #2a2f3a;
-            display: flex;
-            align-items: center;
-            padding: 0 15px;
-            font-size: 13px;
-            color: #aaa;
-        }
+button:hover {
+    background: #89b4fa;
+}
 
-        #editor {
-            flex: 1;
-            width: 100%;
-            resize: none;
-            border: none;
-            outline: none;
-            background: #101218;
-            color: #e8e8e8;
-            padding: 18px;
-            font-family: "Cascadia Code", "Consolas", monospace;
-            font-size: 15px;
-            line-height: 1.6;
-            tab-size: 4;
-        }
+button:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
 
-        #output {
-            flex: 1;
-            padding: 18px;
-            overflow: auto;
-            white-space: pre-wrap;
-            word-break: break-word;
-            font-family: "Cascadia Code", "Consolas", monospace;
-            font-size: 14px;
-            line-height: 1.5;
-            background: #0b0d12;
-        }
+.stop {
+    background: #f7768e;
+}
 
-        .output-normal {
-            color: #e6e6e6;
-        }
+.stop:hover {
+    background: #ff899d;
+}
 
-        .output-error {
-            color: #ff6565;
-        }
+.clear {
+    background: #292e42;
+    color: #c0caf5;
+}
 
-        .output-input {
-            color: #7db7ff;
-        }
+.clear:hover {
+    background: #414868;
+}
 
-        .welcome {
-            color: #777;
-        }
 
-        .footer {
-            position: fixed;
-            bottom: 10px;
-            right: 15px;
-            font-size: 11px;
-            color: #555;
-            pointer-events: none;
-        }
+/* =========================
+   WORKSPACE
+========================= */
 
-        @media (max-width: 800px) {
-            .workspace {
-                grid-template-columns: 1fr;
-                grid-template-rows: 1fr 1fr;
-            }
+.workspace {
+    height: calc(100vh - 58px);
 
-            .panel + .panel {
-                border-left: none;
-                border-top: 1px solid #2a2f3a;
-            }
-        }
-    </style>
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.panel {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    position: relative;
+}
+
+.panel + .panel {
+    border-left: 1px solid #292e42;
+}
+
+.panel-header {
+    height: 40px;
+
+    flex-shrink: 0;
+
+    background: #16161e;
+    border-bottom: 1px solid #292e42;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 14px;
+
+    color: #737aa2;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+}
+
+
+/* =========================
+   EDITOR
+========================= */
+
+.editor-wrapper {
+    flex: 1;
+
+    display: flex;
+
+    overflow: hidden;
+
+    background: #1a1b26;
+}
+
+.line-numbers {
+    width: 50px;
+
+    flex-shrink: 0;
+
+    padding-top: 16px;
+
+    text-align: right;
+
+    padding-right: 12px;
+
+    color: #3b4261;
+
+    font-family:
+        "Cascadia Code",
+        "Consolas",
+        monospace;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+
+    user-select: none;
+
+    overflow: hidden;
+}
+
+.editor-area {
+    position: relative;
+
+    flex: 1;
+
+    min-width: 0;
+
+    overflow: hidden;
+}
+
+#editor {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    resize: none;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: #c0caf5;
+
+    padding: 16px;
+
+    font-family:
+        "Cascadia Code",
+        "Consolas",
+        monospace;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+
+    tab-size: 4;
+
+    white-space: pre;
+
+    overflow: auto;
+
+    caret-color: #7aa2f7;
+}
+
+
+/* =========================
+   TOKYO NIGHT CODE COLOURS
+========================= */
+
+#editor::selection {
+    background: #33467c;
+}
+
+
+/* =========================
+   SUGGESTIONS
+========================= */
+
+.suggestions {
+    position: absolute;
+
+    display: none;
+
+    min-width: 230px;
+
+    max-width: 350px;
+
+    max-height: 240px;
+
+    overflow-y: auto;
+
+    background: #16161e;
+
+    border: 1px solid #414868;
+
+    border-radius: 6px;
+
+    box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.4);
+
+    z-index: 20;
+
+    font-family:
+        "Cascadia Code",
+        "Consolas",
+        monospace;
+
+    font-size: 13px;
+}
+
+.suggestion {
+    padding: 7px 10px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    color: #c0caf5;
+
+    cursor: pointer;
+}
+
+.suggestion:hover,
+.suggestion.selected {
+    background: #292e42;
+}
+
+.suggestion-keyword {
+    color: #bb9af7;
+}
+
+.suggestion-function {
+    color: #7dcfff;
+}
+
+.suggestion-module {
+    color: #73daca;
+}
+
+.suggestion-type {
+    color: #2ac3de;
+}
+
+.suggestion-hint {
+    color: #565f89;
+    font-size: 11px;
+}
+
+
+/* =========================
+   CONSOLE
+========================= */
+
+#console {
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding: 15px;
+
+    background: #16161e;
+
+    font-family:
+        "Cascadia Code",
+        "Consolas",
+        monospace;
+
+    font-size: 14px;
+
+    line-height: 1.55;
+}
+
+.console-line {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.console-normal {
+    color: #c0caf5;
+}
+
+.console-error {
+    color: #f7768e;
+}
+
+.console-system {
+    color: #565f89;
+}
+
+.console-prompt {
+    color: #7aa2f7;
+}
+
+.console-input {
+    color: #9ece6a;
+}
+
+
+/* =========================
+   CONSOLE INPUT
+========================= */
+
+.input-container {
+    display: none;
+
+    padding: 10px 14px;
+
+    background: #16161e;
+
+    border-top: 1px solid #292e42;
+}
+
+.input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.input-prompt {
+    color: #7aa2f7;
+
+    font-family:
+        "Cascadia Code",
+        "Consolas",
+        monospace;
+}
+
+#consoleInput {
+    flex: 1;
+
+    background: #1a1b26;
+
+    color: #9ece6a;
+
+    border: 1px solid #414868;
+
+    border-radius: 5px;
+
+    outline: none;
+
+    padding: 8px;
+
+    font-family:
+        "Cascadia Code",
+        "Consolas",
+        monospace;
+
+    font-size: 14px;
+}
+
+#consoleInput:focus {
+    border-color: #7aa2f7;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 800px) {
+
+    .workspace {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 1fr;
+    }
+
+    .panel + .panel {
+        border-left: none;
+        border-top: 1px solid #292e42;
+    }
+
+    .status {
+        display: none;
+    }
+}
+</style>
 </head>
 
 <body>
 
-    <div class="topbar">
+<!-- =========================
+     TOP BAR
+========================= -->
 
-        <div class="logo">
-            PyLite
-        </div>
+<div class="topbar">
 
-        <div class="status" id="status">
-            Loading Python...
-        </div>
-
-        <button id="runButton" disabled>
-            Run
-        </button>
-
-        <button id="stopButton" class="stop" disabled>
-            Stop
-        </button>
-
-        <button id="clearButton" class="clear">
-            Clear
-        </button>
-
+    <div class="logo">
+        PyLite
     </div>
 
-    <div class="workspace">
+    <div class="status" id="status">
+        Loading Python...
+    </div>
 
-        <div class="panel">
+    <button id="runButton" disabled>
+        Run
+    </button>
 
-            <div class="panel-header">
-                Python Editor
+    <button id="stopButton" class="stop" disabled>
+        Stop
+    </button>
+
+    <button id="clearButton" class="clear">
+        Clear
+    </button>
+
+</div>
+
+
+<!-- =========================
+     WORKSPACE
+========================= -->
+
+<div class="workspace">
+
+    <!-- EDITOR -->
+
+    <div class="panel">
+
+        <div class="panel-header">
+            Python Editor
+        </div>
+
+        <div class="editor-wrapper">
+
+            <div class="line-numbers" id="lineNumbers">
+                1
             </div>
 
-            <textarea id="editor" spellcheck="false">print("Hello, world!")
+            <div class="editor-area">
+
+                <textarea
+                    id="editor"
+                    spellcheck="false"
+                    autocomplete="off"
+                >print("Hello, world!")
 
 name = input("What is your name? ")
 
 print("Hello,", name)
 print("Python is running in your browser!")</textarea>
 
-        </div>
+                <div
+                    class="suggestions"
+                    id="suggestions"
+                ></div>
 
-        <div class="panel">
-
-            <div class="panel-header">
-                Output
-            </div>
-
-            <div id="output">
-                <span class="welcome">Python output will appear here...</span>
             </div>
 
         </div>
 
     </div>
 
-    <div class="footer">
-        Powered by Pyodide
+
+    <!-- CONSOLE -->
+
+    <div class="panel">
+
+        <div class="panel-header">
+            Console
+        </div>
+
+        <div id="console"></div>
+
+        <div
+            class="input-container"
+            id="inputContainer"
+        >
+
+            <div class="input-row">
+
+                <span
+                    class="input-prompt"
+                    id="inputPrompt"
+                >
+                    &gt;&gt;&gt;
+                </span>
+
+                <input
+                    id="consoleInput"
+                    type="text"
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+
+            </div>
+
+        </div>
+
     </div>
+
+</div>
 
 
 <script>
 
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const editor =
+    document.getElementById("editor");
+
+const lineNumbers =
+    document.getElementById("lineNumbers");
+
+const suggestions =
+    document.getElementById("suggestions");
+
+const consoleElement =
+    document.getElementById("console");
+
+const consoleInput =
+    document.getElementById("consoleInput");
+
+const inputContainer =
+    document.getElementById("inputContainer");
+
+const inputPrompt =
+    document.getElementById("inputPrompt");
+
+const runButton =
+    document.getElementById("runButton");
+
+const stopButton =
+    document.getElementById("stopButton");
+
+const clearButton =
+    document.getElementById("clearButton");
+
+const status =
+    document.getElementById("status");
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
 let pyodide = null;
+
 let running = false;
-let executionId = 0;
 
-const editor = document.getElementById("editor");
-const output = document.getElementById("output");
+let executionID = 0;
 
-const runButton = document.getElementById("runButton");
-const stopButton = document.getElementById("stopButton");
-const clearButton = document.getElementById("clearButton");
+let waitingForInput = false;
 
-const status = document.getElementById("status");
+let inputResolver = null;
+
+let selectedSuggestion = 0;
 
 
-/* -----------------------------
-   Output
------------------------------ */
+/* =========================================================
+   PYTHON KEYWORDS / SUGGESTIONS
+========================================================= */
 
-function clearOutput() {
-    output.innerHTML = "";
+const suggestionsList = [
+
+    ["and", "keyword"],
+    ["as", "keyword"],
+    ["assert", "keyword"],
+    ["async", "keyword"],
+    ["await", "keyword"],
+    ["break", "keyword"],
+    ["class", "keyword"],
+    ["continue", "keyword"],
+    ["def", "keyword"],
+    ["del", "keyword"],
+    ["elif", "keyword"],
+    ["else", "keyword"],
+    ["except", "keyword"],
+    ["False", "keyword"],
+    ["finally", "keyword"],
+    ["for", "keyword"],
+    ["from", "keyword"],
+    ["global", "keyword"],
+    ["if", "keyword"],
+    ["import", "keyword"],
+    ["in", "keyword"],
+    ["is", "keyword"],
+    ["lambda", "keyword"],
+    ["None", "keyword"],
+    ["nonlocal", "keyword"],
+    ["not", "keyword"],
+    ["or", "keyword"],
+    ["pass", "keyword"],
+    ["raise", "keyword"],
+    ["return", "keyword"],
+    ["True", "keyword"],
+    ["try", "keyword"],
+    ["while", "keyword"],
+    ["with", "keyword"],
+    ["yield", "keyword"],
+
+    ["print", "function"],
+    ["input", "function"],
+    ["len", "function"],
+    ["range", "function"],
+    ["str", "function"],
+    ["int", "function"],
+    ["float", "function"],
+    ["bool", "function"],
+    ["list", "function"],
+    ["dict", "function"],
+    ["set", "function"],
+    ["tuple", "function"],
+    ["sum", "function"],
+    ["min", "function"],
+    ["max", "function"],
+    ["abs", "function"],
+    ["round", "function"],
+    ["enumerate", "function"],
+    ["zip", "function"],
+    ["open", "function"],
+    ["sorted", "function"],
+
+    ["math", "module"],
+    ["random", "module"],
+    ["datetime", "module"],
+    ["json", "module"],
+    ["os", "module"],
+    ["sys", "module"],
+
+    ["Exception", "type"],
+    ["ValueError", "type"],
+    ["TypeError", "type"],
+    ["RuntimeError", "type"],
+    ["IndexError", "type"],
+    ["KeyError", "type"]
+
+];
+
+
+/* =========================================================
+   CONSOLE
+========================================================= */
+
+function clearConsole() {
+
+    consoleElement.innerHTML = "";
+
 }
 
 
-function writeOutput(text, type = "normal") {
+function writeConsole(
+    text,
+    type = "normal"
+) {
 
-    const span = document.createElement("span");
+    const line =
+        document.createElement("div");
 
-    span.className =
-        type === "error"
-            ? "output-error"
-            : type === "input"
-                ? "output-input"
-                : "output-normal";
+    line.className =
+        "console-line console-" + type;
 
-    span.textContent = text;
+    line.textContent = text;
 
-    output.appendChild(span);
+    consoleElement.appendChild(line);
 
-    output.scrollTop = output.scrollHeight;
+    consoleElement.scrollTop =
+        consoleElement.scrollHeight;
 }
 
 
-function writeLine(text, type = "normal") {
-    writeOutput(text + "\n", type);
+function writeConsoleLine(
+    text = "",
+    type = "normal"
+) {
+
+    writeConsole(text, type);
+
 }
 
 
-/* -----------------------------
-   Load Pyodide
------------------------------ */
+/* =========================================================
+   CUSTOM INPUT
+========================================================= */
+
+function showInput(promptText) {
+
+    waitingForInput = true;
+
+    inputPrompt.textContent =
+        promptText || ">>>";
+
+    inputContainer.style.display =
+        "block";
+
+    consoleInput.value = "";
+
+    consoleInput.focus();
+
+}
+
+
+function hideInput() {
+
+    waitingForInput = false;
+
+    inputContainer.style.display =
+        "none";
+
+}
+
+
+consoleInput.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Enter" &&
+            waitingForInput
+        ) {
+
+            const value =
+                consoleInput.value;
+
+            writeConsole(
+                value,
+                "input"
+            );
+
+            hideInput();
+
+            if (inputResolver) {
+
+                const resolver =
+                    inputResolver;
+
+                inputResolver = null;
+
+                resolver(value);
+            }
+        }
+
+    }
+);
+
+
+/* =========================================================
+   LOAD PYTHON
+========================================================= */
 
 async function loadPython() {
 
     try {
 
-        status.textContent = "Loading Python...";
+        status.textContent =
+            "Loading Python...";
 
-        pyodide = await loadPyodide();
+        pyodide =
+            await loadPyodide();
+
 
         /*
-         * Redirect Python stdout/stderr into our console.
+         * stdout
          */
 
         pyodide.setStdout({
-            batched: text => {
-                writeOutput(text + "\n");
-            }
-        });
 
-        pyodide.setStderr({
-            batched: text => {
-                writeOutput(text + "\n", "error");
+            batched(text) {
+
+                writeConsoleLine(
+                    text
+                );
+
             }
+
         });
 
 
         /*
-         * Replace Python's input() with browser prompt().
-         *
-         * This allows normal Python code such as:
-         *
-         * name = input("Name: ")
+         * stderr
+         */
+
+        pyodide.setStderr({
+
+            batched(text) {
+
+                writeConsoleLine(
+                    text,
+                    "error"
+                );
+
+            }
+
+        });
+
+
+        /*
+         * Create our asynchronous
+         * input function.
          */
 
         await pyodide.runPythonAsync(`
+
 import builtins
+import asyncio
 from js import window
 
-def browser_input(prompt=""):
-    value = window.prompt(str(prompt))
-    if value is None:
-        return ""
-    return value
+async def _browser_input(prompt=""):
 
-builtins.input = browser_input
+    return await window._pyInput(str(prompt))
+
+builtins.input = _browser_input
+
         `);
 
 
-        status.textContent = "Python 3 • Ready";
+        /*
+         * JavaScript function visible
+         * to Python.
+         */
 
-        runButton.disabled = false;
+        window._pyInput =
+            function(prompt) {
+
+                return new Promise(
+                    resolve => {
+
+                        showInput(prompt);
+
+                        inputResolver =
+                            resolve;
+
+                    }
+                );
+
+            };
+
+
+        status.textContent =
+            "Python 3 • Ready";
+
+        runButton.disabled =
+            false;
+
+
+        writeConsoleLine(
+            "Python 3 loaded.",
+            "system"
+        );
+
+        writeConsoleLine(
+            "Press Run to execute your code.",
+            "system"
+        );
+
 
     } catch (error) {
 
-        status.textContent = "Failed to load Python";
+        status.textContent =
+            "Python failed to load";
 
-        writeLine(
-            "Could not load Pyodide: " + error,
+        writeConsoleLine(
+            String(error),
             "error"
         );
 
     }
+
 }
 
 
-/* -----------------------------
-   Run Python
------------------------------ */
+/* =========================================================
+   RUN PYTHON
+========================================================= */
 
 async function runPython() {
 
-    if (!pyodide || running)
+    if (
+        !pyodide ||
+        running
+    ) {
         return;
+    }
+
+
+    /*
+     * Every Run clears the console.
+     */
+
+    clearConsole();
+
 
     running = true;
 
-    const currentExecution = ++executionId;
-
-    runButton.disabled = true;
-    stopButton.disabled = false;
-
-    writeLine("");
-    writeLine(">>> Running...");
+    const id =
+        ++executionID;
 
 
-    const code = editor.value;
+    runButton.disabled =
+        true;
 
-    const startTime = performance.now();
+    stopButton.disabled =
+        false;
+
+
+    writeConsoleLine(
+        ">>> Running...",
+        "system"
+    );
+
+
+    const code =
+        editor.value;
+
+
+    const start =
+        performance.now();
+
 
     try {
 
         /*
-         * Check for a stop request before execution.
+         * Transform input() calls into
+         * our asynchronous input system.
+         *
+         * This allows the browser console
+         * to receive the input.
          */
 
-        if (currentExecution !== executionId)
-            return;
+        const transformed =
+            transformInput(code);
 
 
-        /*
-         * Execute Python.
-         */
-
-        await pyodide.runPythonAsync(code);
+        await pyodide.runPythonAsync(
+            transformed
+        );
 
 
-        if (currentExecution === executionId) {
+        if (
+            id === executionID
+        ) {
 
             const elapsed =
-                (performance.now() - startTime).toFixed(2);
+                (
+                    performance.now() -
+                    start
+                ).toFixed(2);
 
-            writeLine("");
-            writeLine(
-                `>>> Finished in ${elapsed} ms`
+
+            writeConsoleLine(
+                "",
+                "normal"
             );
+
+            writeConsoleLine(
+                `>>> Finished in ${elapsed} ms`,
+                "system"
+            );
+
         }
+
 
     } catch (error) {
 
-        if (currentExecution === executionId) {
+        if (
+            id === executionID
+        ) {
 
-            writeLine("");
-            writeLine(
+            writeConsoleLine(
+                "",
+                "normal"
+            );
+
+            writeConsoleLine(
                 String(error),
                 "error"
             );
@@ -412,111 +1041,701 @@ async function runPython() {
 
     } finally {
 
-        if (currentExecution === executionId) {
+        if (
+            id === executionID
+        ) {
 
             running = false;
 
-            runButton.disabled = false;
-            stopButton.disabled = true;
+            runButton.disabled =
+                false;
+
+            stopButton.disabled =
+                true;
 
         }
 
     }
+
 }
 
 
-/* -----------------------------
-   Stop
------------------------------ */
+/* =========================================================
+   INPUT TRANSFORMATION
+========================================================= */
+
+function transformInput(code) {
+
+    /*
+     * Convert:
+     *
+     * input("Name: ")
+     *
+     * into:
+     *
+     * await _browser_input("Name: ")
+     *
+     * This works for the normal input()
+     * patterns used in beginner Python.
+     */
+
+
+    let result =
+        code.replace(
+            /\binput\s*\(/g,
+            "await _browser_input("
+        );
+
+
+    /*
+     * Also make sure the async function
+     * exists in the Python environment.
+     */
+
+    result =
+        `
+async def _browser_input(prompt=""):
+    return await window._pyInput(str(prompt))
+
+${result}
+        `;
+
+
+    return result;
+
+}
+
+
+/* =========================================================
+   STOP
+========================================================= */
 
 function stopPython() {
 
-    /*
-     * Pyodide cannot safely terminate arbitrary Python
-     * running on the same browser thread.
-     *
-     * We invalidate the current execution and reset the UI.
-     */
-
-    executionId++;
+    executionID++;
 
     running = false;
 
-    runButton.disabled = false;
-    stopButton.disabled = true;
+    hideInput();
 
-    writeLine("");
-    writeLine(">>> Execution stopped.", "error");
+    runButton.disabled =
+        false;
+
+    stopButton.disabled =
+        true;
+
+
+    writeConsoleLine(
+        "",
+        "normal"
+    );
+
+    writeConsoleLine(
+        ">>> Execution stopped.",
+        "error"
+    );
+
 }
 
 
-/* -----------------------------
-   Keyboard shortcuts
------------------------------ */
+/* =========================================================
+   CLEAR
+========================================================= */
 
-editor.addEventListener("keydown", function(event) {
-
-    /*
-     * Ctrl + Enter = Run
-     */
-
-    if (event.ctrlKey && event.key === "Enter") {
-
-        event.preventDefault();
-
-        runPython();
-
-    }
+clearButton.addEventListener(
+    "click",
+    clearConsole
+);
 
 
-    /*
-     * Tab inserts spaces instead of
-     * moving focus away from editor.
-     */
-
-    if (event.key === "Tab") {
-
-        event.preventDefault();
-
-        const start = editor.selectionStart;
-        const end = editor.selectionEnd;
-
-        editor.value =
-            editor.value.substring(0, start) +
-            "    " +
-            editor.value.substring(end);
-
-        editor.selectionStart =
-            editor.selectionEnd =
-                start + 4;
-    }
-
-});
-
-
-/* -----------------------------
-   Buttons
------------------------------ */
+/* =========================================================
+   RUN BUTTON
+========================================================= */
 
 runButton.addEventListener(
     "click",
     runPython
 );
 
-stopButton.addEventListener(
-    "click",
-    stopPython
+
+/* =========================================================
+   EDITOR LINE NUMBERS
+========================================================= */
+
+function updateLineNumbers() {
+
+    const lines =
+        editor.value.split("\n").length;
+
+
+    let output = "";
+
+    for (
+        let i = 1;
+        i <= lines;
+        i++
+    ) {
+
+        output += i + "<br>";
+
+    }
+
+    lineNumbers.innerHTML =
+        output;
+
+}
+
+
+editor.addEventListener(
+    "input",
+    updateLineNumbers
 );
 
-clearButton.addEventListener(
-    "click",
-    clearOutput
+
+editor.addEventListener(
+    "scroll",
+    () => {
+
+        lineNumbers.scrollTop =
+            editor.scrollTop;
+
+    }
 );
 
 
-/* -----------------------------
-   Start
------------------------------ */
+/* =========================================================
+   AUTOCOMPLETE
+========================================================= */
+
+function getCurrentWord() {
+
+    const position =
+        editor.selectionStart;
+
+
+    const before =
+        editor.value.substring(
+            0,
+            position
+        );
+
+
+    const match =
+        before.match(
+            /[A-Za-z_][A-Za-z0-9_]*$/
+        );
+
+
+    if (!match) {
+
+        return "";
+
+    }
+
+
+    return match[0];
+
+}
+
+
+function showSuggestions() {
+
+    const word =
+        getCurrentWord();
+
+
+    if (!word) {
+
+        hideSuggestions();
+
+        return;
+
+    }
+
+
+    const matches =
+        suggestionsList.filter(
+            item =>
+                item[0]
+                    .toLowerCase()
+                    .startsWith(
+                        word.toLowerCase()
+                    )
+        );
+
+
+    if (!matches.length) {
+
+        hideSuggestions();
+
+        return;
+
+    }
+
+
+    selectedSuggestion = 0;
+
+    suggestions.innerHTML = "";
+
+
+    matches.forEach(
+        (item, index) => {
+
+            const element =
+                document.createElement(
+                    "div"
+                );
+
+
+            element.className =
+                "suggestion" +
+                (
+                    index === 0
+                        ? " selected"
+                        : ""
+                );
+
+
+            const name =
+                document.createElement(
+                    "span"
+                );
+
+            name.textContent =
+                item[0];
+
+            name.className =
+                "suggestion-" +
+                item[1];
+
+
+            const hint =
+                document.createElement(
+                    "span"
+                );
+
+            hint.textContent =
+                item[1];
+
+
+            hint.className =
+                "suggestion-hint";
+
+
+            element.appendChild(name);
+
+            element.appendChild(hint);
+
+
+            element.addEventListener(
+                "mousedown",
+                event => {
+
+                    event.preventDefault();
+
+                    acceptSuggestion(
+                        item[0]
+                    );
+
+                }
+            );
+
+
+            suggestions.appendChild(
+                element
+            );
+
+        }
+    );
+
+
+    /*
+     * Position suggestions
+     * approximately below the editor.
+     */
+
+    suggestions.style.display =
+        "block";
+
+}
+
+
+function hideSuggestions() {
+
+    suggestions.style.display =
+        "none";
+
+}
+
+
+function acceptSuggestion(
+    suggestion
+) {
+
+    const position =
+        editor.selectionStart;
+
+
+    const before =
+        editor.value.substring(
+            0,
+            position
+        );
+
+
+    const after =
+        editor.value.substring(
+            position
+        );
+
+
+    const match =
+        before.match(
+            /[A-Za-z_][A-Za-z0-9_]*$/
+        );
+
+
+    if (!match) {
+
+        return;
+
+    }
+
+
+    const start =
+        position -
+        match[0].length;
+
+
+    editor.value =
+        editor.value.substring(
+            0,
+            start
+        ) +
+        suggestion +
+        after;
+
+
+    const newPosition =
+        start +
+        suggestion.length;
+
+
+    editor.selectionStart =
+        newPosition;
+
+    editor.selectionEnd =
+        newPosition;
+
+
+    hideSuggestions();
+
+    updateLineNumbers();
+
+    editor.focus();
+
+}
+
+
+function moveSuggestion(
+    direction
+) {
+
+    const items =
+        suggestions.querySelectorAll(
+            ".suggestion"
+        );
+
+
+    if (!items.length)
+        return;
+
+
+    selectedSuggestion +=
+        direction;
+
+
+    if (
+        selectedSuggestion < 0
+    ) {
+
+        selectedSuggestion =
+            items.length - 1;
+
+    }
+
+
+    if (
+        selectedSuggestion >=
+        items.length
+    ) {
+
+        selectedSuggestion = 0;
+
+    }
+
+
+    items.forEach(
+        (item, index) => {
+
+            item.classList.toggle(
+                "selected",
+                index ===
+                selectedSuggestion
+            );
+
+        }
+    );
+
+}
+
+
+function acceptSelectedSuggestion() {
+
+    const items =
+        suggestions.querySelectorAll(
+            ".suggestion"
+        );
+
+
+    if (!items.length)
+        return false;
+
+
+    const selected =
+        items[selectedSuggestion];
+
+
+    if (!selected)
+        return false;
+
+
+    const text =
+        selected
+            .querySelector("span")
+            .textContent;
+
+
+    acceptSuggestion(text);
+
+    return true;
+
+}
+
+
+/* =========================================================
+   EDITOR KEYBOARD
+========================================================= */
+
+editor.addEventListener(
+    "keydown",
+    event => {
+
+        /*
+         * Ctrl + Enter
+         */
+
+        if (
+            event.ctrlKey &&
+            event.key === "Enter"
+        ) {
+
+            event.preventDefault();
+
+            hideSuggestions();
+
+            runPython();
+
+            return;
+
+        }
+
+
+        /*
+         * Tab
+         */
+
+        if (
+            event.key === "Tab"
+        ) {
+
+            if (
+                suggestions.style.display ===
+                "block"
+            ) {
+
+                event.preventDefault();
+
+                acceptSelectedSuggestion();
+
+                return;
+
+            }
+
+
+            /*
+             * Normal indentation.
+             */
+
+            event.preventDefault();
+
+
+            const start =
+                editor.selectionStart;
+
+            const end =
+                editor.selectionEnd;
+
+
+            editor.value =
+                editor.value.substring(
+                    0,
+                    start
+                ) +
+                "    " +
+                editor.value.substring(
+                    end
+                );
+
+
+            editor.selectionStart =
+                editor.selectionEnd =
+                    start + 4;
+
+
+            updateLineNumbers();
+
+            return;
+
+        }
+
+
+        /*
+         * Arrow down
+         */
+
+        if (
+            event.key === "ArrowDown" &&
+            suggestions.style.display ===
+            "block"
+        ) {
+
+            event.preventDefault();
+
+            moveSuggestion(1);
+
+            return;
+
+        }
+
+
+        /*
+         * Arrow up
+         */
+
+        if (
+            event.key === "ArrowUp" &&
+            suggestions.style.display ===
+            "block"
+        ) {
+
+            event.preventDefault();
+
+            moveSuggestion(-1);
+
+            return;
+
+        }
+
+
+        /*
+         * Enter accepts suggestion.
+         */
+
+        if (
+            event.key === "Enter" &&
+            suggestions.style.display ===
+            "block"
+        ) {
+
+            event.preventDefault();
+
+            acceptSelectedSuggestion();
+
+            return;
+
+        }
+
+
+        /*
+         * Escape closes suggestions.
+         */
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            hideSuggestions();
+
+        }
+
+    }
+);
+
+
+editor.addEventListener(
+    "keyup",
+    event => {
+
+        if (
+            [
+                "ArrowUp",
+                "ArrowDown",
+                "Enter",
+                "Tab",
+                "Escape"
+            ].includes(event.key)
+        ) {
+
+            return;
+
+        }
+
+
+        showSuggestions();
+
+    }
+);
+
+
+/* =========================================================
+   CTRL + L
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.ctrlKey &&
+            event.key.toLowerCase() === "l"
+        ) {
+
+            event.preventDefault();
+
+            clearConsole();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+updateLineNumbers();
 
 loadPython();
 
