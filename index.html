@@ -4,9 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>PyLite</title>
+<title>PyLite Python IDE</title>
 
+<!-- Pyodide -->
 <script src="https://cdn.jsdelivr.net/pyodide/v0.28.2/full/pyodide.js"></script>
+
+<!-- Ace Editor -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.43.2/ace.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.43.2/ext-language_tools.min.js"></script>
 
 <style>
 * {
@@ -15,15 +20,15 @@
 
 html,
 body {
-    margin: 0;
     width: 100%;
     height: 100%;
+    margin: 0;
     overflow: hidden;
 }
 
 body {
-    background: #1a1b26;
-    color: #c0caf5;
+    background: #1e1e2e;
+    color: #cdd6f4;
     font-family: Arial, sans-serif;
 }
 
@@ -33,28 +38,31 @@ body {
 
 .topbar {
     height: 58px;
-    background: #16161e;
-    border-bottom: 1px solid #292e42;
 
     display: flex;
     align-items: center;
 
-    padding: 0 16px;
-    gap: 10px;
+    padding: 0 15px;
+    gap: 9px;
+
+    background: #181825;
+    border-bottom: 1px solid #313244;
 }
 
 .logo {
-    font-size: 19px;
-    font-weight: bold;
-    color: #7aa2f7;
-
     margin-right: auto;
+
+    font-size: 19px;
+    font-weight: 700;
+
+    color: #89b4fa;
 }
 
 .status {
-    color: #565f89;
-    font-size: 13px;
-    margin-right: 8px;
+    margin-right: 7px;
+
+    font-size: 12px;
+    color: #6c7086;
 }
 
 button {
@@ -63,15 +71,16 @@ button {
 
     padding: 8px 15px;
 
-    background: #7aa2f7;
-    color: #1a1b26;
+    font-weight: 600;
 
-    font-weight: bold;
     cursor: pointer;
+
+    background: #89b4fa;
+    color: #11111b;
 }
 
 button:hover {
-    background: #89b4fa;
+    background: #b4befe;
 }
 
 button:disabled {
@@ -80,25 +89,25 @@ button:disabled {
 }
 
 .stop {
-    background: #f7768e;
+    background: #f38ba8;
 }
 
 .stop:hover {
-    background: #ff899d;
+    background: #eba0ac;
 }
 
 .clear {
-    background: #292e42;
-    color: #c0caf5;
+    background: #313244;
+    color: #cdd6f4;
 }
 
 .clear:hover {
-    background: #414868;
+    background: #45475a;
 }
 
 
 /* =========================
-   WORKSPACE
+   MAIN
 ========================= */
 
 .workspace {
@@ -110,209 +119,48 @@ button:disabled {
 
 .panel {
     min-width: 0;
+    min-height: 0;
 
     display: flex;
     flex-direction: column;
-
-    position: relative;
 }
 
 .panel + .panel {
-    border-left: 1px solid #292e42;
+    border-left: 1px solid #313244;
 }
 
 .panel-header {
-    height: 40px;
+    height: 39px;
 
     flex-shrink: 0;
-
-    background: #16161e;
-    border-bottom: 1px solid #292e42;
 
     display: flex;
     align-items: center;
 
     padding: 0 14px;
 
-    color: #737aa2;
-    font-size: 12px;
+    background: #181825;
+    border-bottom: 1px solid #313244;
+
+    color: #7f849c;
+
+    font-size: 11px;
+    font-weight: 600;
+
     text-transform: uppercase;
-    letter-spacing: 0.7px;
+    letter-spacing: 0.8px;
 }
 
 
 /* =========================
-   EDITOR
+   ACE
 ========================= */
 
-.editor-wrapper {
-    flex: 1;
-
-    display: flex;
-
-    overflow: hidden;
-
-    background: #1a1b26;
-}
-
-.line-numbers {
-    width: 50px;
-
-    flex-shrink: 0;
-
-    padding-top: 16px;
-
-    text-align: right;
-
-    padding-right: 12px;
-
-    color: #3b4261;
-
-    font-family:
-        "Cascadia Code",
-        "Consolas",
-        monospace;
-
-    font-size: 14px;
-
-    line-height: 1.6;
-
-    user-select: none;
-
-    overflow: hidden;
-}
-
-.editor-area {
-    position: relative;
-
-    flex: 1;
-
-    min-width: 0;
-
-    overflow: hidden;
-}
-
 #editor {
-    position: absolute;
-
-    inset: 0;
+    flex: 1;
 
     width: 100%;
     height: 100%;
-
-    resize: none;
-
-    border: none;
-    outline: none;
-
-    background: transparent;
-
-    color: #c0caf5;
-
-    padding: 16px;
-
-    font-family:
-        "Cascadia Code",
-        "Consolas",
-        monospace;
-
-    font-size: 14px;
-
-    line-height: 1.6;
-
-    tab-size: 4;
-
-    white-space: pre;
-
-    overflow: auto;
-
-    caret-color: #7aa2f7;
-}
-
-
-/* =========================
-   TOKYO NIGHT CODE COLOURS
-========================= */
-
-#editor::selection {
-    background: #33467c;
-}
-
-
-/* =========================
-   SUGGESTIONS
-========================= */
-
-.suggestions {
-    position: absolute;
-
-    display: none;
-
-    min-width: 230px;
-
-    max-width: 350px;
-
-    max-height: 240px;
-
-    overflow-y: auto;
-
-    background: #16161e;
-
-    border: 1px solid #414868;
-
-    border-radius: 6px;
-
-    box-shadow:
-        0 8px 30px rgba(0, 0, 0, 0.4);
-
-    z-index: 20;
-
-    font-family:
-        "Cascadia Code",
-        "Consolas",
-        monospace;
-
-    font-size: 13px;
-}
-
-.suggestion {
-    padding: 7px 10px;
-
-    display: flex;
-
-    justify-content: space-between;
-
-    gap: 20px;
-
-    color: #c0caf5;
-
-    cursor: pointer;
-}
-
-.suggestion:hover,
-.suggestion.selected {
-    background: #292e42;
-}
-
-.suggestion-keyword {
-    color: #bb9af7;
-}
-
-.suggestion-function {
-    color: #7dcfff;
-}
-
-.suggestion-module {
-    color: #73daca;
-}
-
-.suggestion-type {
-    color: #2ac3de;
-}
-
-.suggestion-hint {
-    color: #565f89;
-    font-size: 11px;
 }
 
 
@@ -320,105 +168,149 @@ button:disabled {
    CONSOLE
 ========================= */
 
+.console-wrapper {
+    flex: 1;
+
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    background: #11111b;
+}
+
 #console {
     flex: 1;
 
+    min-height: 0;
+
+    padding: 14px 16px;
+
     overflow-y: auto;
-
-    padding: 15px;
-
-    background: #16161e;
 
     font-family:
         "Cascadia Code",
-        "Consolas",
+        "Fira Code",
+        Consolas,
         monospace;
 
     font-size: 14px;
-
     line-height: 1.55;
-}
 
-.console-line {
     white-space: pre-wrap;
     word-break: break-word;
 }
 
-.console-normal {
-    color: #c0caf5;
+.console-line {
+    white-space: pre-wrap;
 }
 
-.console-error {
-    color: #f7768e;
+.normal {
+    color: #cdd6f4;
 }
 
-.console-system {
-    color: #565f89;
+.system {
+    color: #6c7086;
 }
 
-.console-prompt {
-    color: #7aa2f7;
+.error {
+    color: #f38ba8;
 }
 
-.console-input {
-    color: #9ece6a;
+.prompt {
+    color: #89b4fa;
+}
+
+.input-output {
+    color: #a6e3a1;
 }
 
 
 /* =========================
-   CONSOLE INPUT
+   INPUT
 ========================= */
 
-.input-container {
+.input-area {
     display: none;
 
-    padding: 10px 14px;
+    padding: 9px 13px;
 
-    background: #16161e;
+    border-top: 1px solid #313244;
 
-    border-top: 1px solid #292e42;
+    background: #181825;
 }
 
 .input-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+
+    gap: 9px;
 }
 
 .input-prompt {
-    color: #7aa2f7;
+    color: #89b4fa;
 
     font-family:
         "Cascadia Code",
-        "Consolas",
+        Consolas,
         monospace;
+
+    font-size: 14px;
+
+    white-space: nowrap;
 }
 
 #consoleInput {
     flex: 1;
 
-    background: #1a1b26;
+    min-width: 0;
 
-    color: #9ece6a;
+    padding: 7px 9px;
 
-    border: 1px solid #414868;
-
+    border: 1px solid #45475a;
     border-radius: 5px;
 
     outline: none;
 
-    padding: 8px;
+    background: #11111b;
+    color: #a6e3a1;
 
     font-family:
         "Cascadia Code",
-        "Consolas",
+        Consolas,
         monospace;
 
     font-size: 14px;
 }
 
 #consoleInput:focus {
-    border-color: #7aa2f7;
+    border-color: #89b4fa;
+}
+
+
+/* =========================
+   RESIZER
+========================= */
+
+.resizer {
+    width: 4px;
+
+    position: absolute;
+
+    top: 58px;
+    bottom: 0;
+
+    left: 50%;
+
+    transform: translateX(-2px);
+
+    z-index: 50;
+
+    cursor: col-resize;
+}
+
+.resizer:hover {
+    background: #89b4fa;
 }
 
 
@@ -428,14 +320,24 @@ button:disabled {
 
 @media (max-width: 800px) {
 
+    body {
+        overflow: auto;
+    }
+
     .workspace {
+        height: calc(100vh - 58px);
+
         grid-template-columns: 1fr;
         grid-template-rows: 1fr 1fr;
     }
 
     .panel + .panel {
-        border-left: none;
-        border-top: 1px solid #292e42;
+        border-left: 0;
+        border-top: 1px solid #313244;
+    }
+
+    .resizer {
+        display: none;
     }
 
     .status {
@@ -445,136 +347,133 @@ button:disabled {
 </style>
 </head>
 
+
 <body>
 
 <!-- =========================
-     TOP BAR
+     HEADER
 ========================= -->
 
-<div class="topbar">
+<header class="topbar">
 
     <div class="logo">
         PyLite
     </div>
 
-    <div class="status" id="status">
+    <div
+        class="status"
+        id="status"
+    >
         Loading Python...
     </div>
 
-    <button id="runButton" disabled>
+    <button
+        id="runButton"
+        disabled
+    >
         Run
     </button>
 
-    <button id="stopButton" class="stop" disabled>
+    <button
+        id="stopButton"
+        class="stop"
+        disabled
+    >
         Stop
     </button>
 
-    <button id="clearButton" class="clear">
+    <button
+        id="clearButton"
+        class="clear"
+    >
         Clear
     </button>
 
-</div>
+</header>
 
 
 <!-- =========================
-     WORKSPACE
+     MAIN
 ========================= -->
 
-<div class="workspace">
+<main class="workspace">
 
     <!-- EDITOR -->
 
-    <div class="panel">
+    <section class="panel">
 
         <div class="panel-header">
-            Python Editor
+            Python
         </div>
 
-        <div class="editor-wrapper">
+        <div id="editor"></div>
 
-            <div class="line-numbers" id="lineNumbers">
-                1
-            </div>
-
-            <div class="editor-area">
-
-                <textarea
-                    id="editor"
-                    spellcheck="false"
-                    autocomplete="off"
-                >print("Hello, world!")
-
-name = input("What is your name? ")
-
-print("Hello,", name)
-print("Python is running in your browser!")</textarea>
-
-                <div
-                    class="suggestions"
-                    id="suggestions"
-                ></div>
-
-            </div>
-
-        </div>
-
-    </div>
+    </section>
 
 
     <!-- CONSOLE -->
 
-    <div class="panel">
+    <section class="panel">
 
         <div class="panel-header">
             Console
         </div>
 
-        <div id="console"></div>
+        <div class="console-wrapper">
 
-        <div
-            class="input-container"
-            id="inputContainer"
-        >
+            <div id="console"></div>
 
-            <div class="input-row">
+            <div
+                class="input-area"
+                id="inputArea"
+            >
 
-                <span
-                    class="input-prompt"
-                    id="inputPrompt"
-                >
-                    &gt;&gt;&gt;
-                </span>
+                <div class="input-row">
 
-                <input
-                    id="consoleInput"
-                    type="text"
-                    autocomplete="off"
-                    spellcheck="false"
-                >
+                    <span
+                        class="input-prompt"
+                        id="inputPrompt"
+                    >
+                        &gt;&gt;&gt;
+                    </span>
+
+                    <input
+                        id="consoleInput"
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+
+                </div>
 
             </div>
 
         </div>
 
-    </div>
+    </section>
 
-</div>
+</main>
 
 
 <script>
 
 /* =========================================================
-   ELEMENTS
+   GLOBALS
 ========================================================= */
 
-const editor =
-    document.getElementById("editor");
+let pyodide = null;
 
-const lineNumbers =
-    document.getElementById("lineNumbers");
+let editor = null;
 
-const suggestions =
-    document.getElementById("suggestions");
+let running = false;
+
+let executionId = 0;
+
+let inputResolver = null;
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
 
 const consoleElement =
     document.getElementById("console");
@@ -582,8 +481,8 @@ const consoleElement =
 const consoleInput =
     document.getElementById("consoleInput");
 
-const inputContainer =
-    document.getElementById("inputContainer");
+const inputArea =
+    document.getElementById("inputArea");
 
 const inputPrompt =
     document.getElementById("inputPrompt");
@@ -602,101 +501,580 @@ const status =
 
 
 /* =========================================================
-   STATE
+   CUSTOM TOKYO-NIGHT-LIKE ACE THEME
 ========================================================= */
 
-let pyodide = null;
+ace.define(
+    "ace/theme/pylite",
+    [
+        "require",
+        "exports",
+        "module",
+        "ace/lib/dom"
+    ],
+    function(
+        require,
+        exports,
+        module
+    ) {
 
-let running = false;
+        exports.isDark = true;
 
-let executionID = 0;
+        exports.cssClass =
+            "ace-pylite";
 
-let waitingForInput = false;
+        exports.cssText = `
 
-let inputResolver = null;
+            .ace-pylite
+                {
+                    background-color: #1e1e2e;
+                    color: #cdd6f4;
+                }
 
-let selectedSuggestion = 0;
+            .ace-pylite
+                .ace_gutter
+                {
+                    background: #181825;
+                    color: #585b70;
+                }
+
+            .ace-pylite
+                .ace_print-margin
+                {
+                    width: 1px;
+                    background: #313244;
+                }
+
+            .ace-pylite
+                .ace_cursor
+                {
+                    color: #f5e0e0;
+                }
+
+            .ace-pylite
+                .ace_marker-layer
+                .ace_selection
+                {
+                    background: #45475a;
+                }
+
+            .ace-pylite
+                .ace_marker-layer
+                .ace_active-line
+                {
+                    background: #242435;
+                }
+
+            .ace-pylite
+                .ace_gutter-active-line
+                {
+                    background: #242435;
+                    color: #cdd6f4;
+                }
+
+            .ace-pylite
+                .ace_keyword
+                {
+                    color: #cba6f7;
+                }
+
+            .ace-pylite
+                .ace_keyword.ace_operator
+                {
+                    color: #89dceb;
+                }
+
+            .ace-pylite
+                .ace_constant
+                {
+                    color: #fab387;
+                }
+
+            .ace-pylite
+                .ace_constant.ace_numeric
+                {
+                    color: #fab387;
+                }
+
+            .ace-pylite
+                .ace_string
+                {
+                    color: #a6e3a1;
+                }
+
+            .ace-pylite
+                .ace_comment
+                {
+                    color: #6c7086;
+                    font-style: italic;
+                }
+
+            .ace-pylite
+                .ace_support.ace_function
+                {
+                    color: #89b4fa;
+                }
+
+            .ace-pylite
+                .ace_entity.ace_name.ace_function
+                {
+                    color: #89b4fa;
+                }
+
+            .ace-pylite
+                .ace_support.ace_class
+                {
+                    color: #f9e2af;
+                }
+
+            .ace-pylite
+                .ace_entity.ace_name.ace_class
+                {
+                    color: #f9e2af;
+                }
+
+            .ace-pylite
+                .ace_variable
+                {
+                    color: #cdd6f4;
+                }
+
+            .ace-pylite
+                .ace_variable.ace_parameter
+                {
+                    color: #f2cdcd;
+                }
+
+            .ace-pylite
+                .ace_meta
+                {
+                    color: #f9e2af;
+                }
+
+            .ace-pylite
+                .ace_invalid
+                {
+                    color: #f38ba8;
+                    background-color: transparent;
+                }
+
+            .ace-pylite
+                .ace_paren
+                {
+                    color: #89b4fa;
+                }
+
+        `;
+
+        const dom =
+            require("ace/lib/dom");
+
+        dom.importCssString(
+            exports.cssText,
+            exports.cssClass
+        );
+    }
+);
 
 
 /* =========================================================
-   PYTHON KEYWORDS / SUGGESTIONS
+   CREATE EDITOR
 ========================================================= */
 
-const suggestionsList = [
+editor = ace.edit("editor");
 
-    ["and", "keyword"],
-    ["as", "keyword"],
-    ["assert", "keyword"],
-    ["async", "keyword"],
-    ["await", "keyword"],
-    ["break", "keyword"],
-    ["class", "keyword"],
-    ["continue", "keyword"],
-    ["def", "keyword"],
-    ["del", "keyword"],
-    ["elif", "keyword"],
-    ["else", "keyword"],
-    ["except", "keyword"],
-    ["False", "keyword"],
-    ["finally", "keyword"],
-    ["for", "keyword"],
-    ["from", "keyword"],
-    ["global", "keyword"],
-    ["if", "keyword"],
-    ["import", "keyword"],
-    ["in", "keyword"],
-    ["is", "keyword"],
-    ["lambda", "keyword"],
-    ["None", "keyword"],
-    ["nonlocal", "keyword"],
-    ["not", "keyword"],
-    ["or", "keyword"],
-    ["pass", "keyword"],
-    ["raise", "keyword"],
-    ["return", "keyword"],
-    ["True", "keyword"],
-    ["try", "keyword"],
-    ["while", "keyword"],
-    ["with", "keyword"],
-    ["yield", "keyword"],
+editor.setTheme(
+    "ace/theme/pylite"
+);
 
-    ["print", "function"],
-    ["input", "function"],
-    ["len", "function"],
-    ["range", "function"],
-    ["str", "function"],
-    ["int", "function"],
-    ["float", "function"],
-    ["bool", "function"],
-    ["list", "function"],
-    ["dict", "function"],
-    ["set", "function"],
-    ["tuple", "function"],
-    ["sum", "function"],
-    ["min", "function"],
-    ["max", "function"],
-    ["abs", "function"],
-    ["round", "function"],
-    ["enumerate", "function"],
-    ["zip", "function"],
-    ["open", "function"],
-    ["sorted", "function"],
+editor.session.setMode(
+    "ace/mode/python"
+);
 
-    ["math", "module"],
-    ["random", "module"],
-    ["datetime", "module"],
-    ["json", "module"],
-    ["os", "module"],
-    ["sys", "module"],
 
-    ["Exception", "type"],
-    ["ValueError", "type"],
-    ["TypeError", "type"],
-    ["RuntimeError", "type"],
-    ["IndexError", "type"],
-    ["KeyError", "type"]
+/* Editor settings */
+
+editor.setOptions({
+
+    fontSize: "15px",
+
+    showPrintMargin: false,
+
+    showFoldWidgets: true,
+
+    displayIndentGuides: true,
+
+    highlightActiveLine: true,
+
+    highlightSelectedWord: true,
+
+    tabSize: 4,
+
+    useSoftTabs: true,
+
+    enableBasicAutocompletion: true,
+
+    enableLiveAutocompletion: true,
+
+    enableSnippets: true,
+
+    behavioursEnabled: true,
+
+    wrap: false
+
+});
+
+
+editor.session.setUseSoftTabs(true);
+
+editor.session.setTabSize(4);
+
+
+/* =========================================================
+   AUTOCOMPLETION
+========================================================= */
+
+const pythonKeywords = [
+
+    "and",
+    "as",
+    "assert",
+    "async",
+    "await",
+    "break",
+    "case",
+    "class",
+    "continue",
+    "def",
+    "del",
+    "elif",
+    "else",
+    "except",
+    "finally",
+    "for",
+    "from",
+    "global",
+    "if",
+    "import",
+    "in",
+    "is",
+    "lambda",
+    "match",
+    "None",
+    "nonlocal",
+    "not",
+    "or",
+    "pass",
+    "raise",
+    "return",
+    "True",
+    "try",
+    "type",
+    "while",
+    "with",
+    "yield"
 
 ];
+
+
+const pythonBuiltins = [
+
+    "abs",
+    "all",
+    "any",
+    "ascii",
+    "bin",
+    "bool",
+    "breakpoint",
+    "bytearray",
+    "bytes",
+    "callable",
+    "chr",
+    "classmethod",
+    "compile",
+    "complex",
+    "delattr",
+    "dict",
+    "dir",
+    "divmod",
+    "enumerate",
+    "eval",
+    "exec",
+    "filter",
+    "float",
+    "format",
+    "frozenset",
+    "getattr",
+    "globals",
+    "hasattr",
+    "hash",
+    "help",
+    "hex",
+    "id",
+    "input",
+    "int",
+    "isinstance",
+    "issubclass",
+    "iter",
+    "len",
+    "list",
+    "locals",
+    "map",
+    "max",
+    "memoryview",
+    "min",
+    "next",
+    "object",
+    "oct",
+    "open",
+    "ord",
+    "pow",
+    "print",
+    "property",
+    "range",
+    "repr",
+    "reversed",
+    "round",
+    "set",
+    "setattr",
+    "slice",
+    "sorted",
+    "staticmethod",
+    "str",
+    "sum",
+    "super",
+    "tuple",
+    "type",
+    "vars",
+    "zip"
+
+];
+
+
+const pythonModules = [
+
+    "math",
+    "random",
+    "datetime",
+    "json",
+    "os",
+    "sys",
+    "time",
+    "statistics",
+    "re",
+    "collections",
+    "itertools",
+    "functools",
+    "decimal",
+    "fractions",
+    "pathlib",
+    "string"
+
+];
+
+
+const pythonTypes = [
+
+    "int",
+    "float",
+    "str",
+    "bool",
+    "list",
+    "tuple",
+    "dict",
+    "set",
+    "bytes",
+    "complex",
+    "object",
+    "Exception",
+    "ValueError",
+    "TypeError",
+    "IndexError",
+    "KeyError",
+    "RuntimeError"
+
+];
+
+
+/*
+ * Custom Python completer.
+ */
+
+const pythonCompleter = {
+
+    identifierRegexps: [
+        /[a-zA-Z_][a-zA-Z0-9_]*/
+    ],
+
+    getCompletions:
+        function(
+            editor,
+            session,
+            pos,
+            prefix,
+            callback
+        ) {
+
+            const completions = [];
+
+
+            pythonKeywords.forEach(
+                word => {
+
+                    completions.push({
+
+                        caption: word,
+
+                        value: word,
+
+                        meta: "keyword",
+
+                        score: 900
+
+                    });
+
+                }
+            );
+
+
+            pythonBuiltins.forEach(
+                word => {
+
+                    completions.push({
+
+                        caption: word,
+
+                        value: word,
+
+                        meta: "builtin",
+
+                        score: 800
+
+                    });
+
+                }
+            );
+
+
+            pythonModules.forEach(
+                word => {
+
+                    completions.push({
+
+                        caption: word,
+
+                        value: word,
+
+                        meta: "module",
+
+                        score: 700
+
+                    });
+
+                }
+            );
+
+
+            pythonTypes.forEach(
+                word => {
+
+                    completions.push({
+
+                        caption: word,
+
+                        value: word,
+
+                        meta: "type",
+
+                        score: 750
+
+                    });
+
+                }
+            );
+
+
+            /*
+             * Add variables and functions
+             * already present in the editor.
+             */
+
+            const code =
+                editor.getValue();
+
+
+            const variableMatches =
+                code.matchAll(
+                    /\b(?:def|class)\s+([A-Za-z_]\w*)/g
+                );
+
+
+            for (
+                const match of variableMatches
+            ) {
+
+                completions.push({
+
+                    caption: match[1],
+
+                    value: match[1],
+
+                    meta: "defined",
+
+                    score: 950
+
+                });
+
+            }
+
+
+            const assignmentMatches =
+                code.matchAll(
+                    /\b([A-Za-z_]\w*)\s*=/g
+                );
+
+
+            for (
+                const match of assignmentMatches
+            ) {
+
+                completions.push({
+
+                    caption: match[1],
+
+                    value: match[1],
+
+                    meta: "variable",
+
+                    score: 850
+
+                });
+
+            }
+
+
+            callback(
+                null,
+                completions
+            );
+
+        }
+
+};
+
+
+/*
+ * Register completer.
+ */
+
+const langTools =
+    ace.require(
+        "ace/ext/language_tools"
+    );
+
+langTools.addCompleter(
+    pythonCompleter
+);
 
 
 /* =========================================================
@@ -719,14 +1097,19 @@ function writeConsole(
         document.createElement("div");
 
     line.className =
-        "console-line console-" + type;
+        "console-line " +
+        type;
 
-    line.textContent = text;
+    line.textContent =
+        text;
 
-    consoleElement.appendChild(line);
+    consoleElement.appendChild(
+        line
+    );
 
     consoleElement.scrollTop =
         consoleElement.scrollHeight;
+
 }
 
 
@@ -735,37 +1118,48 @@ function writeConsoleLine(
     type = "normal"
 ) {
 
-    writeConsole(text, type);
+    writeConsole(
+        text,
+        type
+    );
 
 }
 
 
 /* =========================================================
-   CUSTOM INPUT
+   INPUT
 ========================================================= */
 
-function showInput(promptText) {
+function requestInput(
+    promptText
+) {
 
-    waitingForInput = true;
+    return new Promise(
+        resolve => {
 
-    inputPrompt.textContent =
-        promptText || ">>>";
+            inputResolver =
+                resolve;
 
-    inputContainer.style.display =
-        "block";
+            inputPrompt.textContent =
+                promptText || ">>>";
 
-    consoleInput.value = "";
+            inputArea.style.display =
+                "block";
 
-    consoleInput.focus();
+            consoleInput.value =
+                "";
+
+            consoleInput.focus();
+
+        }
+    );
 
 }
 
 
-function hideInput() {
+function finishInput() {
 
-    waitingForInput = false;
-
-    inputContainer.style.display =
+    inputArea.style.display =
         "none";
 
 }
@@ -776,29 +1170,37 @@ consoleInput.addEventListener(
     event => {
 
         if (
-            event.key === "Enter" &&
-            waitingForInput
+            event.key !== "Enter"
+        ) {
+            return;
+        }
+
+
+        const value =
+            consoleInput.value;
+
+
+        writeConsole(
+            value,
+            "input-output"
+        );
+
+
+        finishInput();
+
+
+        if (
+            inputResolver
         ) {
 
-            const value =
-                consoleInput.value;
+            const resolver =
+                inputResolver;
 
-            writeConsole(
-                value,
-                "input"
-            );
+            inputResolver =
+                null;
 
-            hideInput();
+            resolver(value);
 
-            if (inputResolver) {
-
-                const resolver =
-                    inputResolver;
-
-                inputResolver = null;
-
-                resolver(value);
-            }
         }
 
     }
@@ -806,7 +1208,7 @@ consoleInput.addEventListener(
 
 
 /* =========================================================
-   LOAD PYTHON
+   PYODIDE
 ========================================================= */
 
 async function loadPython() {
@@ -815,6 +1217,7 @@ async function loadPython() {
 
         status.textContent =
             "Loading Python...";
+
 
         pyodide =
             await loadPyodide();
@@ -828,8 +1231,9 @@ async function loadPython() {
 
             batched(text) {
 
-                writeConsoleLine(
-                    text
+                writeConsole(
+                    text,
+                    "normal"
                 );
 
             }
@@ -845,7 +1249,7 @@ async function loadPython() {
 
             batched(text) {
 
-                writeConsoleLine(
+                writeConsole(
                     text,
                     "error"
                 );
@@ -856,49 +1260,29 @@ async function loadPython() {
 
 
         /*
-         * Create our asynchronous
-         * input function.
+         * Expose JavaScript input
+         * function to Python.
+         */
+
+        window.pyLiteInput =
+            requestInput;
+
+
+        /*
+         * Import the JavaScript
+         * bridge into Python.
          */
 
         await pyodide.runPythonAsync(`
 
-import builtins
-import asyncio
-from js import window
-
-async def _browser_input(prompt=""):
-
-    return await window._pyInput(str(prompt))
-
-builtins.input = _browser_input
+from js import pyLiteInput
 
         `);
 
 
-        /*
-         * JavaScript function visible
-         * to Python.
-         */
-
-        window._pyInput =
-            function(prompt) {
-
-                return new Promise(
-                    resolve => {
-
-                        showInput(prompt);
-
-                        inputResolver =
-                            resolve;
-
-                    }
-                );
-
-            };
-
-
         status.textContent =
             "Python 3 • Ready";
+
 
         runButton.disabled =
             false;
@@ -910,7 +1294,7 @@ builtins.input = _browser_input
         );
 
         writeConsoleLine(
-            "Press Run to execute your code.",
+            "Ctrl + Enter to run.",
             "system"
         );
 
@@ -919,6 +1303,7 @@ builtins.input = _browser_input
 
         status.textContent =
             "Python failed to load";
+
 
         writeConsoleLine(
             String(error),
@@ -931,7 +1316,54 @@ builtins.input = _browser_input
 
 
 /* =========================================================
-   RUN PYTHON
+   INPUT TRANSFORMATION
+========================================================= */
+
+/*
+ * Python's normal input() is synchronous,
+ * while the browser cannot synchronously
+ * wait for keyboard input without freezing
+ * the entire page.
+ *
+ * We therefore transform input(...)
+ * into await pyLiteInput(...).
+ */
+
+function transformInput(
+    code
+) {
+
+    /*
+     * This handles common input() usage.
+     *
+     * Example:
+     *
+     * name = input("Name: ")
+     *
+     * becomes:
+     *
+     * name = await pyLiteInput("Name: ")
+     */
+
+    let transformed =
+        code.replace(
+            /\binput\s*\(/g,
+            "await pyLiteInput("
+        );
+
+
+    /*
+     * runPythonAsync supports top-level
+     * await in Pyodide.
+     */
+
+    return transformed;
+
+}
+
+
+/* =========================================================
+   RUN
 ========================================================= */
 
 async function runPython() {
@@ -940,21 +1372,28 @@ async function runPython() {
         !pyodide ||
         running
     ) {
+
         return;
+
     }
 
 
     /*
-     * Every Run clears the console.
+     * Clear console EVERY time
+     * Run is pressed.
      */
 
     clearConsole();
 
 
+    finishInput();
+
+
     running = true;
 
-    const id =
-        ++executionID;
+
+    const currentExecution =
+        ++executionId;
 
 
     runButton.disabled =
@@ -971,7 +1410,7 @@ async function runPython() {
 
 
     const code =
-        editor.value;
+        editor.getValue();
 
 
     const start =
@@ -979,14 +1418,6 @@ async function runPython() {
 
 
     try {
-
-        /*
-         * Transform input() calls into
-         * our asynchronous input system.
-         *
-         * This allows the browser console
-         * to receive the input.
-         */
 
         const transformed =
             transformInput(code);
@@ -998,39 +1429,46 @@ async function runPython() {
 
 
         if (
-            id === executionID
+            currentExecution !==
+            executionId
         ) {
 
-            const elapsed =
-                (
-                    performance.now() -
-                    start
-                ).toFixed(2);
-
-
-            writeConsoleLine(
-                "",
-                "normal"
-            );
-
-            writeConsoleLine(
-                `>>> Finished in ${elapsed} ms`,
-                "system"
-            );
+            return;
 
         }
+
+
+        const elapsed =
+            (
+                performance.now() -
+                start
+            ).toFixed(2);
+
+
+        writeConsoleLine(
+            "",
+            "normal"
+        );
+
+
+        writeConsoleLine(
+            `>>> Finished in ${elapsed} ms`,
+            "system"
+        );
 
 
     } catch (error) {
 
         if (
-            id === executionID
+            currentExecution ===
+            executionId
         ) {
 
             writeConsoleLine(
                 "",
                 "normal"
             );
+
 
             writeConsoleLine(
                 String(error),
@@ -1042,7 +1480,8 @@ async function runPython() {
     } finally {
 
         if (
-            id === executionID
+            currentExecution ===
+            executionId
         ) {
 
             running = false;
@@ -1061,62 +1500,18 @@ async function runPython() {
 
 
 /* =========================================================
-   INPUT TRANSFORMATION
-========================================================= */
-
-function transformInput(code) {
-
-    /*
-     * Convert:
-     *
-     * input("Name: ")
-     *
-     * into:
-     *
-     * await _browser_input("Name: ")
-     *
-     * This works for the normal input()
-     * patterns used in beginner Python.
-     */
-
-
-    let result =
-        code.replace(
-            /\binput\s*\(/g,
-            "await _browser_input("
-        );
-
-
-    /*
-     * Also make sure the async function
-     * exists in the Python environment.
-     */
-
-    result =
-        `
-async def _browser_input(prompt=""):
-    return await window._pyInput(str(prompt))
-
-${result}
-        `;
-
-
-    return result;
-
-}
-
-
-/* =========================================================
    STOP
 ========================================================= */
 
 function stopPython() {
 
-    executionID++;
+    executionId++;
 
     running = false;
 
-    hideInput();
+
+    finishInput();
+
 
     runButton.disabled =
         false;
@@ -1130,6 +1525,7 @@ function stopPython() {
         "normal"
     );
 
+
     writeConsoleLine(
         ">>> Execution stopped.",
         "error"
@@ -1138,9 +1534,17 @@ function stopPython() {
 }
 
 
-/* =========================================================
-   CLEAR
-========================================================= */
+runButton.addEventListener(
+    "click",
+    runPython
+);
+
+
+stopButton.addEventListener(
+    "click",
+    stopPython
+);
+
 
 clearButton.addEventListener(
     "click",
@@ -1149,593 +1553,66 @@ clearButton.addEventListener(
 
 
 /* =========================================================
-   RUN BUTTON
+   KEYBOARD SHORTCUTS
 ========================================================= */
 
-runButton.addEventListener(
-    "click",
-    runPython
+editor.commands.addCommand({
+
+    name: "runPython",
+
+    bindKey: {
+        win: "Ctrl-Enter",
+        mac: "Command-Enter"
+    },
+
+    exec: function() {
+
+        runPython();
+
+    }
+
+});
+
+
+editor.commands.addCommand({
+
+    name: "clearConsole",
+
+    bindKey: {
+        win: "Ctrl-L",
+        mac: "Command-L"
+    },
+
+    exec: function() {
+
+        clearConsole();
+
+    }
+
+});
+
+
+/* =========================================================
+   INITIAL CODE
+========================================================= */
+
+editor.setValue(
+`print("Hello, world!")
+
+name = input("What is your name? ")
+
+print("Hello,", name)
+
+for i in range(5):
+    print("Number:", i)
+`,
+    -1
 );
 
 
 /* =========================================================
-   EDITOR LINE NUMBERS
+   START
 ========================================================= */
-
-function updateLineNumbers() {
-
-    const lines =
-        editor.value.split("\n").length;
-
-
-    let output = "";
-
-    for (
-        let i = 1;
-        i <= lines;
-        i++
-    ) {
-
-        output += i + "<br>";
-
-    }
-
-    lineNumbers.innerHTML =
-        output;
-
-}
-
-
-editor.addEventListener(
-    "input",
-    updateLineNumbers
-);
-
-
-editor.addEventListener(
-    "scroll",
-    () => {
-
-        lineNumbers.scrollTop =
-            editor.scrollTop;
-
-    }
-);
-
-
-/* =========================================================
-   AUTOCOMPLETE
-========================================================= */
-
-function getCurrentWord() {
-
-    const position =
-        editor.selectionStart;
-
-
-    const before =
-        editor.value.substring(
-            0,
-            position
-        );
-
-
-    const match =
-        before.match(
-            /[A-Za-z_][A-Za-z0-9_]*$/
-        );
-
-
-    if (!match) {
-
-        return "";
-
-    }
-
-
-    return match[0];
-
-}
-
-
-function showSuggestions() {
-
-    const word =
-        getCurrentWord();
-
-
-    if (!word) {
-
-        hideSuggestions();
-
-        return;
-
-    }
-
-
-    const matches =
-        suggestionsList.filter(
-            item =>
-                item[0]
-                    .toLowerCase()
-                    .startsWith(
-                        word.toLowerCase()
-                    )
-        );
-
-
-    if (!matches.length) {
-
-        hideSuggestions();
-
-        return;
-
-    }
-
-
-    selectedSuggestion = 0;
-
-    suggestions.innerHTML = "";
-
-
-    matches.forEach(
-        (item, index) => {
-
-            const element =
-                document.createElement(
-                    "div"
-                );
-
-
-            element.className =
-                "suggestion" +
-                (
-                    index === 0
-                        ? " selected"
-                        : ""
-                );
-
-
-            const name =
-                document.createElement(
-                    "span"
-                );
-
-            name.textContent =
-                item[0];
-
-            name.className =
-                "suggestion-" +
-                item[1];
-
-
-            const hint =
-                document.createElement(
-                    "span"
-                );
-
-            hint.textContent =
-                item[1];
-
-
-            hint.className =
-                "suggestion-hint";
-
-
-            element.appendChild(name);
-
-            element.appendChild(hint);
-
-
-            element.addEventListener(
-                "mousedown",
-                event => {
-
-                    event.preventDefault();
-
-                    acceptSuggestion(
-                        item[0]
-                    );
-
-                }
-            );
-
-
-            suggestions.appendChild(
-                element
-            );
-
-        }
-    );
-
-
-    /*
-     * Position suggestions
-     * approximately below the editor.
-     */
-
-    suggestions.style.display =
-        "block";
-
-}
-
-
-function hideSuggestions() {
-
-    suggestions.style.display =
-        "none";
-
-}
-
-
-function acceptSuggestion(
-    suggestion
-) {
-
-    const position =
-        editor.selectionStart;
-
-
-    const before =
-        editor.value.substring(
-            0,
-            position
-        );
-
-
-    const after =
-        editor.value.substring(
-            position
-        );
-
-
-    const match =
-        before.match(
-            /[A-Za-z_][A-Za-z0-9_]*$/
-        );
-
-
-    if (!match) {
-
-        return;
-
-    }
-
-
-    const start =
-        position -
-        match[0].length;
-
-
-    editor.value =
-        editor.value.substring(
-            0,
-            start
-        ) +
-        suggestion +
-        after;
-
-
-    const newPosition =
-        start +
-        suggestion.length;
-
-
-    editor.selectionStart =
-        newPosition;
-
-    editor.selectionEnd =
-        newPosition;
-
-
-    hideSuggestions();
-
-    updateLineNumbers();
-
-    editor.focus();
-
-}
-
-
-function moveSuggestion(
-    direction
-) {
-
-    const items =
-        suggestions.querySelectorAll(
-            ".suggestion"
-        );
-
-
-    if (!items.length)
-        return;
-
-
-    selectedSuggestion +=
-        direction;
-
-
-    if (
-        selectedSuggestion < 0
-    ) {
-
-        selectedSuggestion =
-            items.length - 1;
-
-    }
-
-
-    if (
-        selectedSuggestion >=
-        items.length
-    ) {
-
-        selectedSuggestion = 0;
-
-    }
-
-
-    items.forEach(
-        (item, index) => {
-
-            item.classList.toggle(
-                "selected",
-                index ===
-                selectedSuggestion
-            );
-
-        }
-    );
-
-}
-
-
-function acceptSelectedSuggestion() {
-
-    const items =
-        suggestions.querySelectorAll(
-            ".suggestion"
-        );
-
-
-    if (!items.length)
-        return false;
-
-
-    const selected =
-        items[selectedSuggestion];
-
-
-    if (!selected)
-        return false;
-
-
-    const text =
-        selected
-            .querySelector("span")
-            .textContent;
-
-
-    acceptSuggestion(text);
-
-    return true;
-
-}
-
-
-/* =========================================================
-   EDITOR KEYBOARD
-========================================================= */
-
-editor.addEventListener(
-    "keydown",
-    event => {
-
-        /*
-         * Ctrl + Enter
-         */
-
-        if (
-            event.ctrlKey &&
-            event.key === "Enter"
-        ) {
-
-            event.preventDefault();
-
-            hideSuggestions();
-
-            runPython();
-
-            return;
-
-        }
-
-
-        /*
-         * Tab
-         */
-
-        if (
-            event.key === "Tab"
-        ) {
-
-            if (
-                suggestions.style.display ===
-                "block"
-            ) {
-
-                event.preventDefault();
-
-                acceptSelectedSuggestion();
-
-                return;
-
-            }
-
-
-            /*
-             * Normal indentation.
-             */
-
-            event.preventDefault();
-
-
-            const start =
-                editor.selectionStart;
-
-            const end =
-                editor.selectionEnd;
-
-
-            editor.value =
-                editor.value.substring(
-                    0,
-                    start
-                ) +
-                "    " +
-                editor.value.substring(
-                    end
-                );
-
-
-            editor.selectionStart =
-                editor.selectionEnd =
-                    start + 4;
-
-
-            updateLineNumbers();
-
-            return;
-
-        }
-
-
-        /*
-         * Arrow down
-         */
-
-        if (
-            event.key === "ArrowDown" &&
-            suggestions.style.display ===
-            "block"
-        ) {
-
-            event.preventDefault();
-
-            moveSuggestion(1);
-
-            return;
-
-        }
-
-
-        /*
-         * Arrow up
-         */
-
-        if (
-            event.key === "ArrowUp" &&
-            suggestions.style.display ===
-            "block"
-        ) {
-
-            event.preventDefault();
-
-            moveSuggestion(-1);
-
-            return;
-
-        }
-
-
-        /*
-         * Enter accepts suggestion.
-         */
-
-        if (
-            event.key === "Enter" &&
-            suggestions.style.display ===
-            "block"
-        ) {
-
-            event.preventDefault();
-
-            acceptSelectedSuggestion();
-
-            return;
-
-        }
-
-
-        /*
-         * Escape closes suggestions.
-         */
-
-        if (
-            event.key === "Escape"
-        ) {
-
-            hideSuggestions();
-
-        }
-
-    }
-);
-
-
-editor.addEventListener(
-    "keyup",
-    event => {
-
-        if (
-            [
-                "ArrowUp",
-                "ArrowDown",
-                "Enter",
-                "Tab",
-                "Escape"
-            ].includes(event.key)
-        ) {
-
-            return;
-
-        }
-
-
-        showSuggestions();
-
-    }
-);
-
-
-/* =========================================================
-   CTRL + L
-========================================================= */
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if (
-            event.ctrlKey &&
-            event.key.toLowerCase() === "l"
-        ) {
-
-            event.preventDefault();
-
-            clearConsole();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   INITIALIZE
-========================================================= */
-
-updateLineNumbers();
 
 loadPython();
 
