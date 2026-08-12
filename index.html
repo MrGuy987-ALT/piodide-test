@@ -1,15 +1,526 @@
-<!doctype html>
-<html>
-  <head>
-      <script src="https://cdn.jsdelivr.net/pyodide/v314.0.4/full/pyodide.js"></script>
-  </head>
-  <body>
-    <script type="text/javascript">
-      async function main(){
-        let pyodide = await loadPyodide();
-        console.log(pyodide.runPython("1 + 2"));
-      }
-      main();
-    </script>
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PyLite - Python Emulator</title>
+
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.28.2/full/pyodide.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #0f1117;
+            color: #e6e6e6;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .topbar {
+            height: 60px;
+            background: #171a22;
+            border-bottom: 1px solid #2a2f3a;
+            display: flex;
+            align-items: center;
+            padding: 0 18px;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            margin-right: auto;
+        }
+
+        .status {
+            font-size: 13px;
+            color: #999;
+        }
+
+        button {
+            border: none;
+            border-radius: 6px;
+            padding: 9px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            background: #2d6cdf;
+            color: white;
+        }
+
+        button:hover {
+            background: #3d7bec;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .stop {
+            background: #c83c3c;
+        }
+
+        .stop:hover {
+            background: #e04747;
+        }
+
+        .clear {
+            background: #292e38;
+        }
+
+        .workspace {
+            height: calc(100vh - 60px);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .panel {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel + .panel {
+            border-left: 1px solid #2a2f3a;
+        }
+
+        .panel-header {
+            height: 42px;
+            background: #171a22;
+            border-bottom: 1px solid #2a2f3a;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        #editor {
+            flex: 1;
+            width: 100%;
+            resize: none;
+            border: none;
+            outline: none;
+            background: #101218;
+            color: #e8e8e8;
+            padding: 18px;
+            font-family: "Cascadia Code", "Consolas", monospace;
+            font-size: 15px;
+            line-height: 1.6;
+            tab-size: 4;
+        }
+
+        #output {
+            flex: 1;
+            padding: 18px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: "Cascadia Code", "Consolas", monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            background: #0b0d12;
+        }
+
+        .output-normal {
+            color: #e6e6e6;
+        }
+
+        .output-error {
+            color: #ff6565;
+        }
+
+        .output-input {
+            color: #7db7ff;
+        }
+
+        .welcome {
+            color: #777;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 10px;
+            right: 15px;
+            font-size: 11px;
+            color: #555;
+            pointer-events: none;
+        }
+
+        @media (max-width: 800px) {
+            .workspace {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 1fr;
+            }
+
+            .panel + .panel {
+                border-left: none;
+                border-top: 1px solid #2a2f3a;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="topbar">
+
+        <div class="logo">
+            PyLite
+        </div>
+
+        <div class="status" id="status">
+            Loading Python...
+        </div>
+
+        <button id="runButton" disabled>
+            Run
+        </button>
+
+        <button id="stopButton" class="stop" disabled>
+            Stop
+        </button>
+
+        <button id="clearButton" class="clear">
+            Clear
+        </button>
+
+    </div>
+
+    <div class="workspace">
+
+        <div class="panel">
+
+            <div class="panel-header">
+                Python Editor
+            </div>
+
+            <textarea id="editor" spellcheck="false">print("Hello, world!")
+
+name = input("What is your name? ")
+
+print("Hello,", name)
+print("Python is running in your browser!")</textarea>
+
+        </div>
+
+        <div class="panel">
+
+            <div class="panel-header">
+                Output
+            </div>
+
+            <div id="output">
+                <span class="welcome">Python output will appear here...</span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="footer">
+        Powered by Pyodide
+    </div>
+
+
+<script>
+
+let pyodide = null;
+let running = false;
+let executionId = 0;
+
+const editor = document.getElementById("editor");
+const output = document.getElementById("output");
+
+const runButton = document.getElementById("runButton");
+const stopButton = document.getElementById("stopButton");
+const clearButton = document.getElementById("clearButton");
+
+const status = document.getElementById("status");
+
+
+/* -----------------------------
+   Output
+----------------------------- */
+
+function clearOutput() {
+    output.innerHTML = "";
+}
+
+
+function writeOutput(text, type = "normal") {
+
+    const span = document.createElement("span");
+
+    span.className =
+        type === "error"
+            ? "output-error"
+            : type === "input"
+                ? "output-input"
+                : "output-normal";
+
+    span.textContent = text;
+
+    output.appendChild(span);
+
+    output.scrollTop = output.scrollHeight;
+}
+
+
+function writeLine(text, type = "normal") {
+    writeOutput(text + "\n", type);
+}
+
+
+/* -----------------------------
+   Load Pyodide
+----------------------------- */
+
+async function loadPython() {
+
+    try {
+
+        status.textContent = "Loading Python...";
+
+        pyodide = await loadPyodide();
+
+        /*
+         * Redirect Python stdout/stderr into our console.
+         */
+
+        pyodide.setStdout({
+            batched: text => {
+                writeOutput(text + "\n");
+            }
+        });
+
+        pyodide.setStderr({
+            batched: text => {
+                writeOutput(text + "\n", "error");
+            }
+        });
+
+
+        /*
+         * Replace Python's input() with browser prompt().
+         *
+         * This allows normal Python code such as:
+         *
+         * name = input("Name: ")
+         */
+
+        await pyodide.runPythonAsync(`
+import builtins
+from js import window
+
+def browser_input(prompt=""):
+    value = window.prompt(str(prompt))
+    if value is None:
+        return ""
+    return value
+
+builtins.input = browser_input
+        `);
+
+
+        status.textContent = "Python 3 • Ready";
+
+        runButton.disabled = false;
+
+    } catch (error) {
+
+        status.textContent = "Failed to load Python";
+
+        writeLine(
+            "Could not load Pyodide: " + error,
+            "error"
+        );
+
+    }
+}
+
+
+/* -----------------------------
+   Run Python
+----------------------------- */
+
+async function runPython() {
+
+    if (!pyodide || running)
+        return;
+
+    running = true;
+
+    const currentExecution = ++executionId;
+
+    runButton.disabled = true;
+    stopButton.disabled = false;
+
+    writeLine("");
+    writeLine(">>> Running...");
+
+
+    const code = editor.value;
+
+    const startTime = performance.now();
+
+    try {
+
+        /*
+         * Check for a stop request before execution.
+         */
+
+        if (currentExecution !== executionId)
+            return;
+
+
+        /*
+         * Execute Python.
+         */
+
+        await pyodide.runPythonAsync(code);
+
+
+        if (currentExecution === executionId) {
+
+            const elapsed =
+                (performance.now() - startTime).toFixed(2);
+
+            writeLine("");
+            writeLine(
+                `>>> Finished in ${elapsed} ms`
+            );
+        }
+
+    } catch (error) {
+
+        if (currentExecution === executionId) {
+
+            writeLine("");
+            writeLine(
+                String(error),
+                "error"
+            );
+
+        }
+
+    } finally {
+
+        if (currentExecution === executionId) {
+
+            running = false;
+
+            runButton.disabled = false;
+            stopButton.disabled = true;
+
+        }
+
+    }
+}
+
+
+/* -----------------------------
+   Stop
+----------------------------- */
+
+function stopPython() {
+
+    /*
+     * Pyodide cannot safely terminate arbitrary Python
+     * running on the same browser thread.
+     *
+     * We invalidate the current execution and reset the UI.
+     */
+
+    executionId++;
+
+    running = false;
+
+    runButton.disabled = false;
+    stopButton.disabled = true;
+
+    writeLine("");
+    writeLine(">>> Execution stopped.", "error");
+}
+
+
+/* -----------------------------
+   Keyboard shortcuts
+----------------------------- */
+
+editor.addEventListener("keydown", function(event) {
+
+    /*
+     * Ctrl + Enter = Run
+     */
+
+    if (event.ctrlKey && event.key === "Enter") {
+
+        event.preventDefault();
+
+        runPython();
+
+    }
+
+
+    /*
+     * Tab inserts spaces instead of
+     * moving focus away from editor.
+     */
+
+    if (event.key === "Tab") {
+
+        event.preventDefault();
+
+        const start = editor.selectionStart;
+        const end = editor.selectionEnd;
+
+        editor.value =
+            editor.value.substring(0, start) +
+            "    " +
+            editor.value.substring(end);
+
+        editor.selectionStart =
+            editor.selectionEnd =
+                start + 4;
+    }
+
+});
+
+
+/* -----------------------------
+   Buttons
+----------------------------- */
+
+runButton.addEventListener(
+    "click",
+    runPython
+);
+
+stopButton.addEventListener(
+    "click",
+    stopPython
+);
+
+clearButton.addEventListener(
+    "click",
+    clearOutput
+);
+
+
+/* -----------------------------
+   Start
+----------------------------- */
+
+loadPython();
+
+</script>
+
+</body>
 </html>
