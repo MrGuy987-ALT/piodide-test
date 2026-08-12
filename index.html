@@ -18,9 +18,7 @@
     <title>PyLite</title>
 
     <script src="https://cdn.jsdelivr.net/pyodide/v0.28.2/full/pyodide.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.43.2/ace.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.43.2/ext-language_tools.min.js"></script>
 
     <style>
@@ -773,7 +771,7 @@
 
 
         /* =========================================================
-           ACE EDITOR THEME
+           ACE THEME
         ========================================================= */
 
         ace.define(
@@ -868,8 +866,7 @@
                         color: #7aa2f7;
                     }
 
-                    .ace-pylite
-                    .ace_support.ace_class {
+                    .ace-pylite .ace_support.ace_class {
                         color: #e0af68;
                     }
 
@@ -952,6 +949,33 @@
 
 
         /* =========================================================
+           DEFAULT CODE
+        ========================================================= */
+
+        editor.setValue(
+`import math
+import time
+
+print("Calculated Initialized")
+
+num1 = input("What shall the first number be? ")
+
+print("You entered:", num1)
+
+if num1.isdigit():
+    number = int(num1)
+
+    print("Square:", number ** 2)
+    print("Square root:", math.sqrt(number))
+
+print()
+print("Done.")
+`,
+            -1
+        );
+
+
+        /* =========================================================
            AUTOCOMPLETE
         ========================================================= */
 
@@ -1026,7 +1050,8 @@
             "os",
             "sys",
             "time",
-            "turtle"
+            "turtle",
+            "asyncio"
 
         ];
 
@@ -1342,12 +1367,21 @@
                 this.colorValue =
                     "#000000";
 
+                this.fillColorValue =
+                    "#000000";
+
                 this.widthValue = 1;
 
                 this.visible = true;
 
                 this.speedValue = 0;
 
+                this.shapeValue =
+                    "classic";
+
+                this.filling = false;
+
+                this.fillPath = [];
 
                 turtleDrawingCtx.clearRect(
                     0,
@@ -1355,7 +1389,6 @@
                     turtleDrawingCanvas.width,
                     turtleDrawingCanvas.height
                 );
-
 
                 turtleDrawingCtx.fillStyle =
                     "white";
@@ -1367,14 +1400,12 @@
                     turtleDrawingCanvas.height
                 );
 
-
                 turtleCtx.clearRect(
                     0,
                     0,
                     turtleCanvas.width,
                     turtleCanvas.height
                 );
-
 
                 this.drawTurtle();
 
@@ -1414,37 +1445,30 @@
                     180
                 );
 
-
                 turtleCtx.beginPath();
 
-                turtleCtx.moveTo(
-                    16,
-                    0
-                );
+                if (this.shapeValue === "arrow") {
 
-                turtleCtx.lineTo(
-                    -10,
-                    -9
-                );
+                    turtleCtx.moveTo(16, 0);
+                    turtleCtx.lineTo(-10, -8);
+                    turtleCtx.lineTo(-6, 0);
+                    turtleCtx.lineTo(-10, 8);
 
-                turtleCtx.lineTo(
-                    -7,
-                    0
-                );
+                } else {
 
-                turtleCtx.lineTo(
-                    -10,
-                    9
-                );
+                    turtleCtx.moveTo(16, 0);
+                    turtleCtx.lineTo(-10, -9);
+                    turtleCtx.lineTo(-7, 0);
+                    turtleCtx.lineTo(-10, 9);
+
+                }
 
                 turtleCtx.closePath();
-
 
                 turtleCtx.fillStyle =
                     "#7aa2f7";
 
                 turtleCtx.fill();
-
 
                 turtleCtx.strokeStyle =
                     "#16161e";
@@ -1464,18 +1488,15 @@
                 distance =
                     Number(distance);
 
-
                 const radians =
                     this.angle *
                     Math.PI /
                     180;
 
-
                 const nx =
                     this.x +
                     Math.cos(radians) *
                     distance;
-
 
                 const ny =
                     this.y -
@@ -1511,10 +1532,18 @@
                 }
 
 
+                if (this.filling) {
+
+                    this.fillPath.push({
+                        x: nx,
+                        y: ny
+                    });
+
+                }
+
+
                 this.x = nx;
-
                 this.y = ny;
-
 
                 this.drawTurtle();
 
@@ -1522,9 +1551,7 @@
 
 
             fd(distance) {
-
                 this.forward(distance);
-
             }
 
 
@@ -1538,16 +1565,12 @@
 
 
             bk(distance) {
-
                 this.backward(distance);
-
             }
 
 
             back(distance) {
-
                 this.backward(distance);
-
             }
 
 
@@ -1562,9 +1585,7 @@
 
 
             lt(degrees) {
-
                 this.left(degrees);
-
             }
 
 
@@ -1579,37 +1600,27 @@
 
 
             rt(degrees) {
-
                 this.right(degrees);
-
             }
 
 
             penup() {
-
                 this.pen = false;
-
             }
 
 
             pu() {
-
                 this.penup();
-
             }
 
 
             pendown() {
-
                 this.pen = true;
-
             }
 
 
             pd() {
-
                 this.pendown();
-
             }
 
 
@@ -1618,21 +1629,16 @@
                 if (y === undefined) {
 
                     y = x[1];
-
                     x = x[0];
 
                 }
 
-
                 x = Number(x);
-
                 y = Number(y);
-
 
                 const nx =
                     turtleDrawingCanvas.width / 2 +
                     x;
-
 
                 const ny =
                     turtleDrawingCanvas.height / 2 -
@@ -1668,9 +1674,7 @@
 
 
                 this.x = nx;
-
                 this.y = ny;
-
 
                 this.drawTurtle();
 
@@ -1718,16 +1722,12 @@
 
 
             xcor() {
-
                 return this.getx();
-
             }
 
 
             ycor() {
-
                 return this.gety();
-
             }
 
 
@@ -1756,32 +1756,26 @@
                 extent =
                     Number(extent);
 
-
                 const steps =
                     Math.max(
                         20,
                         Math.ceil(
-                            Math.abs(extent) *
-                            2
+                            Math.abs(extent) * 2
                         )
                     );
 
-
                 const angleStep =
                     extent / steps;
-
 
                 const circumference =
                     2 *
                     Math.PI *
                     Math.abs(radius);
 
-
                 const distance =
                     circumference *
                     Math.abs(angleStep) /
                     360;
-
 
                 for (
                     let i = 0;
@@ -1807,12 +1801,23 @@
                 this.colorValue =
                     String(value);
 
+                this.fillColorValue =
+                    String(value);
+
             }
 
 
             pencolor(value) {
 
                 this.colorValue =
+                    String(value);
+
+            }
+
+
+            fillcolor(value) {
+
+                this.fillColorValue =
                     String(value);
 
             }
@@ -1833,6 +1838,173 @@
             }
 
 
+            begin_fill() {
+
+                this.filling = true;
+
+                this.fillPath = [
+                    {
+                        x: this.x,
+                        y: this.y
+                    }
+                ];
+
+                turtleDrawingCtx.beginPath();
+
+                turtleDrawingCtx.moveTo(
+                    this.x,
+                    this.y
+                );
+
+            }
+
+
+            end_fill() {
+
+                if (!this.filling) {
+                    return;
+                }
+
+                this.filling = false;
+
+                turtleDrawingCtx.closePath();
+
+                turtleDrawingCtx.fillStyle =
+                    this.fillColorValue;
+
+                turtleDrawingCtx.fill();
+
+                this.fillPath = [];
+
+            }
+
+
+            dot(size = 5, color = null) {
+
+                size =
+                    Number(size);
+
+                turtleDrawingCtx.beginPath();
+
+                turtleDrawingCtx.arc(
+                    this.x,
+                    this.y,
+                    size / 2,
+                    0,
+                    Math.PI * 2
+                );
+
+                turtleDrawingCtx.fillStyle =
+                    color === null
+                        ? this.colorValue
+                        : String(color);
+
+                turtleDrawingCtx.fill();
+
+                this.drawTurtle();
+
+            }
+
+
+            stamp() {
+
+                turtleDrawingCtx.save();
+
+                turtleDrawingCtx.translate(
+                    this.x,
+                    this.y
+                );
+
+                turtleDrawingCtx.rotate(
+                    -this.angle *
+                    Math.PI /
+                    180
+                );
+
+                turtleDrawingCtx.beginPath();
+
+                turtleDrawingCtx.moveTo(
+                    12,
+                    0
+                );
+
+                turtleDrawingCtx.lineTo(
+                    -8,
+                    -7
+                );
+
+                turtleDrawingCtx.lineTo(
+                    -5,
+                    0
+                );
+
+                turtleDrawingCtx.lineTo(
+                    -8,
+                    7
+                );
+
+                turtleDrawingCtx.closePath();
+
+                turtleDrawingCtx.fillStyle =
+                    this.colorValue;
+
+                turtleDrawingCtx.fill();
+
+                turtleDrawingCtx.restore();
+
+            }
+
+
+            write(
+                text,
+                move = false,
+                align = "left",
+                font = null
+            ) {
+
+                turtleDrawingCtx.save();
+
+                turtleDrawingCtx.font =
+                    font
+                        ? `${font[1]}px ${font[2]}`
+                        : "16px Arial";
+
+                turtleDrawingCtx.textAlign =
+                    align;
+
+                turtleDrawingCtx.fillStyle =
+                    this.colorValue;
+
+                turtleDrawingCtx.fillText(
+                    String(text),
+                    this.x,
+                    this.y
+                );
+
+                turtleDrawingCtx.restore();
+
+                if (move) {
+
+                    this.x +=
+                        String(text).length * 9;
+
+                }
+
+                this.drawTurtle();
+
+            }
+
+
+            shape(value) {
+
+                this.shapeValue =
+                    String(value);
+
+                this.drawTurtle();
+
+            }
+
+
             clear() {
 
                 turtleDrawingCtx.clearRect(
@@ -1842,10 +2014,8 @@
                     turtleDrawingCanvas.height
                 );
 
-
                 turtleDrawingCtx.fillStyle =
                     "white";
-
 
                 turtleDrawingCtx.fillRect(
                     0,
@@ -1853,7 +2023,6 @@
                     turtleDrawingCanvas.width,
                     turtleDrawingCanvas.height
                 );
-
 
                 this.drawTurtle();
 
@@ -1878,9 +2047,7 @@
 
 
             ht() {
-
                 this.hideturtle();
-
             }
 
 
@@ -1894,9 +2061,7 @@
 
 
             st() {
-
                 this.showturtle();
-
             }
 
         }
@@ -1935,10 +2100,8 @@
                     }
                 );
 
-
             const url =
                 URL.createObjectURL(blob);
-
 
             webFrame.src =
                 url;
@@ -2026,7 +2189,7 @@ from js import pyLiteTurtle
 # INPUT
 # =========================================================
 
-async def _pylite_input(prompt=""):
+async def _pylite_input_async(prompt=""):
 
     return await pyLiteInput(
         str(prompt)
@@ -2034,36 +2197,27 @@ async def _pylite_input(prompt=""):
 
 
 # =========================================================
-# TURTLE MODULE
+# TURTLE
 # =========================================================
 
-turtle = types.ModuleType(
-    "turtle"
-)
+turtle = types.ModuleType("turtle")
 
 
 class Turtle:
 
     def __init__(self):
-
         self._turtle = pyLiteTurtle
 
 
     def forward(self, distance):
-
-        self._turtle.forward(
-            float(distance)
-        )
+        self._turtle.forward(float(distance))
 
 
     fd = forward
 
 
     def backward(self, distance):
-
-        self._turtle.backward(
-            float(distance)
-        )
+        self._turtle.backward(float(distance))
 
 
     bk = backward
@@ -2071,27 +2225,20 @@ class Turtle:
 
 
     def left(self, degrees):
-
-        self._turtle.left(
-            float(degrees)
-        )
+        self._turtle.left(float(degrees))
 
 
     lt = left
 
 
     def right(self, degrees):
-
-        self._turtle.right(
-            float(degrees)
-        )
+        self._turtle.right(float(degrees))
 
 
     rt = right
 
 
     def penup(self):
-
         self._turtle.penup()
 
 
@@ -2099,7 +2246,6 @@ class Turtle:
 
 
     def pendown(self):
-
         self._turtle.pendown()
 
 
@@ -2109,9 +2255,7 @@ class Turtle:
     def goto(self, x, y=None):
 
         if y is None:
-
             x, y = x
-
 
         self._turtle.goto(
             float(x),
@@ -2124,39 +2268,26 @@ class Turtle:
 
 
     def setx(self, x):
-
-        self._turtle.setx(
-            float(x)
-        )
+        self._turtle.setx(float(x))
 
 
     def sety(self, y):
-
-        self._turtle.sety(
-            float(y)
-        )
+        self._turtle.sety(float(y))
 
 
     def xcor(self):
-
         return self._turtle.xcor()
 
 
     def ycor(self):
-
         return self._turtle.ycor()
 
 
     def home(self):
-
         self._turtle.home()
 
 
-    def circle(
-        self,
-        radius,
-        extent=None
-    ):
+    def circle(self, radius, extent=None):
 
         if extent is None:
 
@@ -2173,48 +2304,83 @@ class Turtle:
 
 
     def color(self, value):
-
-        self._turtle.color(
-            str(value)
-        )
+        self._turtle.color(str(value))
 
 
     def pencolor(self, value):
+        self._turtle.pencolor(str(value))
 
-        self._turtle.pencolor(
-            str(value)
-        )
+
+    def fillcolor(self, value):
+        self._turtle.fillcolor(str(value))
 
 
     def pensize(self, value):
-
-        self._turtle.pensize(
-            float(value)
-        )
+        self._turtle.pensize(float(value))
 
 
     width = pensize
 
 
-    def clear(self):
+    def begin_fill(self):
+        self._turtle.begin_fill()
 
+
+    def end_fill(self):
+        self._turtle.end_fill()
+
+
+    def dot(self, size=5, color=None):
+
+        if color is None:
+            self._turtle.dot(float(size))
+        else:
+            self._turtle.dot(
+                float(size),
+                str(color)
+            )
+
+
+    def stamp(self):
+        return self._turtle.stamp()
+
+
+    def write(
+        self,
+        text,
+        move=False,
+        align="left",
+        font=None
+    ):
+
+        if font is None:
+            font = ("Arial", 16, "normal")
+
+        self._turtle.write(
+            str(text),
+            bool(move),
+            str(align),
+            font
+        )
+
+
+    def shape(self, value):
+        self._turtle.shape(str(value))
+
+
+    def clear(self):
         self._turtle.clear()
 
 
     def reset(self):
-
         self._turtle.reset()
 
 
     def speed(self, value):
-
-        self._turtle.speed(
-            float(value)
-        )
+        self._turtle.speed(float(value))
 
 
     def hideturtle(self):
-
         self._turtle.hideturtle()
 
 
@@ -2222,216 +2388,185 @@ class Turtle:
 
 
     def showturtle(self):
-
         self._turtle.showturtle()
 
 
     st = showturtle
 
 
-# =========================================================
-# GLOBAL TURTLE
-# =========================================================
-
 _turtle_instance = Turtle()
 
 
 def forward(distance):
-
-    _turtle_instance.forward(
-        distance
-    )
+    _turtle_instance.forward(distance)
 
 
 def fd(distance):
-
     forward(distance)
 
 
 def backward(distance):
-
-    _turtle_instance.backward(
-        distance
-    )
+    _turtle_instance.backward(distance)
 
 
 def bk(distance):
-
     backward(distance)
 
 
 def back(distance):
-
     backward(distance)
 
 
 def left(degrees):
-
-    _turtle_instance.left(
-        degrees
-    )
+    _turtle_instance.left(degrees)
 
 
 def lt(degrees):
-
     left(degrees)
 
 
 def right(degrees):
-
-    _turtle_instance.right(
-        degrees
-    )
+    _turtle_instance.right(degrees)
 
 
 def rt(degrees):
-
     right(degrees)
 
 
 def penup():
-
     _turtle_instance.penup()
 
 
 def pu():
-
     penup()
 
 
 def pendown():
-
     _turtle_instance.pendown()
 
 
 def pd():
-
     pendown()
 
 
 def goto(x, y=None):
-
-    _turtle_instance.goto(
-        x,
-        y
-    )
+    _turtle_instance.goto(x, y)
 
 
 def setpos(x, y=None):
-
     goto(x, y)
 
 
 def setposition(x, y=None):
-
     goto(x, y)
 
 
 def home():
-
     _turtle_instance.home()
 
 
 def xcor():
-
     return _turtle_instance.xcor()
 
 
 def ycor():
-
     return _turtle_instance.ycor()
 
 
-def circle(
-    radius,
-    extent=None
-):
-
-    if extent is None:
-
-        _turtle_instance.circle(
-            radius
-        )
-
-    else:
-
-        _turtle_instance.circle(
-            radius,
-            extent
-        )
+def circle(radius, extent=None):
+    _turtle_instance.circle(
+        radius,
+        extent
+    )
 
 
 def color(value):
-
-    _turtle_instance.color(
-        value
-    )
+    _turtle_instance.color(value)
 
 
 def pencolor(value):
+    _turtle_instance.pencolor(value)
 
-    _turtle_instance.pencolor(
-        value
-    )
+
+def fillcolor(value):
+    _turtle_instance.fillcolor(value)
 
 
 def pensize(value):
-
-    _turtle_instance.pensize(
-        value
-    )
+    _turtle_instance.pensize(value)
 
 
 def width(value):
+    _turtle_instance.width(value)
 
-    _turtle_instance.width(
-        value
+
+def begin_fill():
+    _turtle_instance.begin_fill()
+
+
+def end_fill():
+    _turtle_instance.end_fill()
+
+
+def dot(size=5, color=None):
+    _turtle_instance.dot(
+        size,
+        color
     )
 
 
-def clear():
+def stamp():
+    return _turtle_instance.stamp()
 
+
+def write(
+    text,
+    move=False,
+    align="left",
+    font=None
+):
+
+    _turtle_instance.write(
+        text,
+        move,
+        align,
+        font
+    )
+
+
+def shape(value):
+    _turtle_instance.shape(value)
+
+
+def clear():
     _turtle_instance.clear()
 
 
 def reset():
-
     _turtle_instance.reset()
 
 
 def speed(value):
-
-    _turtle_instance.speed(
-        value
-    )
+    _turtle_instance.speed(value)
 
 
 def hideturtle():
-
     _turtle_instance.hideturtle()
 
 
 def ht():
-
     hideturtle()
 
 
 def showturtle():
-
     _turtle_instance.showturtle()
 
 
 def st():
-
     showturtle()
 
 
-# =========================================================
-# PYTHON-SIDE RESET
-# =========================================================
-
 def _pylite_reset():
-
     _turtle_instance.reset()
 
 
@@ -2473,9 +2608,18 @@ turtle.circle = circle
 
 turtle.color = color
 turtle.pencolor = pencolor
+turtle.fillcolor = fillcolor
 
 turtle.pensize = pensize
 turtle.width = width
+
+turtle.begin_fill = begin_fill
+turtle.end_fill = end_fill
+
+turtle.dot = dot
+turtle.stamp = stamp
+turtle.write = write
+turtle.shape = shape
 
 turtle.clear = clear
 turtle.reset = reset
@@ -2486,7 +2630,7 @@ turtle.hideturtle = hideturtle
 turtle.ht = ht
 
 turtle.showturtle = showturtle
-turtle.st = st
+turtle.st = showturtle
 
 turtle._pylite_reset = _pylite_reset
 
@@ -2522,12 +2666,10 @@ sys.modules["turtle"] = turtle
                 status.textContent =
                     "Python failed to load";
 
-
                 writeConsoleLine(
                     String(error),
                     "error"
                 );
-
 
                 console.error(error);
 
@@ -2537,24 +2679,32 @@ sys.modules["turtle"] = turtle
 
 
         /* =========================================================
-           INPUT TRANSFORMATION
+           PYTHON RUNNER
         ========================================================= */
 
-        function transformInput(code) {
+        async function runPython() {
 
-            return code.replace(
-                /\binput\s*\(/g,
-                "_pylite_input("
-            );
+            if (
+                !pyodide ||
+                running
+            ) {
+                return;
+            }
 
-        }
+
+            clearConsole();
+
+            finishInput();
+
+            clearPythonCanvas();
 
 
-        /* =========================================================
-           RESET PYTHON TURTLE
-        ========================================================= */
+            /* =====================================================
+               RESET TURTLE
+            ===================================================== */
 
-        function resetPythonTurtle() {
+            browserTurtle.reset();
+
 
             try {
 
@@ -2568,60 +2718,11 @@ turtle._pylite_reset()
             catch (error) {
 
                 console.error(
-                    "Failed to reset Python turtle:",
+                    "Turtle reset failed:",
                     error
                 );
 
             }
-
-        }
-
-
-        /* =========================================================
-           RUN
-        ========================================================= */
-
-        async function runPython() {
-
-            if (
-                !pyodide ||
-                running
-            ) {
-
-                return;
-
-            }
-
-
-            /* =====================================================
-               CLEAN PREVIOUS RUN
-            ===================================================== */
-
-            clearConsole();
-
-            finishInput();
-
-            clearPythonCanvas();
-
-
-            /*
-             * Reset the JavaScript turtle.
-             *
-             * This completely clears the drawing and returns
-             * the turtle to the centre.
-             */
-
-            browserTurtle.reset();
-
-
-            /*
-             * Reset the Python-side turtle object as well.
-             *
-             * This is important because the Python module
-             * survives between executions.
-             */
-
-            resetPythonTurtle();
 
 
             running = true;
@@ -2652,48 +2753,145 @@ turtle._pylite_reset()
 
             try {
 
-                const transformed =
-                    transformInput(code);
-
-
                 /*
-                 * IMPORTANT:
+                 * The user's code is parsed with Python's AST.
                  *
-                 * Every run receives a completely new
-                 * Python namespace.
+                 * Every input() call becomes:
                  *
-                 * This means variables, functions and objects
-                 * from the previous program do not leak
-                 * into the next execution.
+                 *     await _pylite_input(...)
+                 *
+                 * before execution.
+                 *
+                 * Top-level await is supported.
                  */
 
-                const wrappedCode = `
-
-async def __pylite_main__():
-
-    pylite_globals = {
-        "__name__": "__main__",
-        "__builtins__": __builtins__
-    }
-
-    exec(
-        compile(
-            ${JSON.stringify(transformed)},
-            "<editor>",
-            "exec"
-        ),
-        pylite_globals,
-        pylite_globals
-    )
+                const source =
+                    JSON.stringify(code);
 
 
-await __pylite_main__()
+                const runner = `
+
+import ast
+import builtins
+
+
+# =========================================================
+# SOURCE
+# =========================================================
+
+_source = ${source}
+
+
+# =========================================================
+# PARSE
+# =========================================================
+
+_tree = ast.parse(
+    _source,
+    filename="<editor>",
+    mode="exec"
+)
+
+
+# =========================================================
+# INPUT TRANSFORMER
+# =========================================================
+
+class InputTransformer(ast.NodeTransformer):
+
+    def visit_Call(self, node):
+
+        node = self.generic_visit(node)
+
+        if (
+            isinstance(node.func, ast.Name)
+            and node.func.id == "input"
+        ):
+
+            replacement = ast.Await(
+                value=ast.Call(
+                    func=ast.Name(
+                        id="_pylite_input",
+                        ctx=ast.Load()
+                    ),
+                    args=node.args,
+                    keywords=node.keywords
+                )
+            )
+
+            return ast.copy_location(
+                replacement,
+                node
+            )
+
+        return node
+
+
+_tree = InputTransformer().visit(_tree)
+
+ast.fix_missing_locations(_tree)
+
+
+# =========================================================
+# COMPILE
+# =========================================================
+
+_flags = getattr(
+    ast,
+    "PyCF_ALLOW_TOP_LEVEL_AWAIT",
+    0
+)
+
+
+_code = compile(
+    _tree,
+    "<editor>",
+    "exec",
+    flags=_flags,
+    dont_inherit=True
+)
+
+
+# =========================================================
+# USER NAMESPACE
+# =========================================================
+
+_pylite_globals = {
+
+    "__name__": "__main__",
+
+    "__builtins__":
+        builtins.__dict__,
+
+    "_pylite_input":
+        _pylite_input_async
+
+}
+
+
+# =========================================================
+# EXECUTE
+# =========================================================
+
+_result = eval(
+    _code,
+    _pylite_globals,
+    _pylite_globals
+)
+
+
+if hasattr(
+    _result,
+    "__await__"
+):
+
+    await _result
 
 `;
 
 
                 await pyodide.runPythonAsync(
-                    wrappedCode
+                    runner
                 );
 
 
